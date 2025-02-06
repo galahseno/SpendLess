@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.main.navigation.NavigationRoot
+import org.koin.compose.KoinContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,8 +15,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SpendLessTheme {
-                val navController = rememberNavController()
-                NavigationRoot(navController = navController)
+                KoinContext {
+                    val navController = rememberNavController()
+                    NavigationRoot(navController = navController)
+                }
             }
         }
     }

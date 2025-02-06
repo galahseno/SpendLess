@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">SpendLess</string>
+    <string name="welcome_back">Welcome back!</string>
+    <string name="enter_login_detail">Enter you login details</string>
+    <string name="username_hint">Username</string>
+    <string name="pin_hint">PIN</string>
+    <string name="log_in">Log in</string>
+    <string name="new_to_spendless">New to SpendLess?</string>
+    <string name="invalid_username">username min 3 character and max 14 character</string>
+    <string name="invalid_pin">PIN must be 5 digits</string>
+    <string name="invalid_username_space">username cannot contain spaces</string>
 </resources>
