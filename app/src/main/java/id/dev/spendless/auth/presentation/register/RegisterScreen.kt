@@ -100,11 +100,11 @@ private fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(screenBackground)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(screenBackground)
                 .verticalScroll(rememberScrollState())
                 .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),

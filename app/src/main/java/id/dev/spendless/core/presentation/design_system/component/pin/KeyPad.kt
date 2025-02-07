@@ -1,4 +1,4 @@
-package id.dev.spendless.core.presentation.design_system.component
+package id.dev.spendless.core.presentation.design_system.component.pin
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -36,7 +37,7 @@ fun KeyPad(
     padBackground: Color = keyPadBackground
 ) {
     val numberPadLayout = remember {
-        mutableListOf(
+        mutableStateListOf(
             listOf("1", "2", "3"),
             listOf("4", "5", "6"),
             listOf("7", "8", "9"),

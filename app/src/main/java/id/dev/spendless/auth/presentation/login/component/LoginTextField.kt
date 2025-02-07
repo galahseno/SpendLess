@@ -49,7 +49,7 @@ fun LoginTextField(
         textStyle = MaterialTheme.typography.titleMedium,
         supportingText = {
             supportingText?.let {
-                if (text.isNotEmpty()){
+                if (text.isNotEmpty()) {
                     Text(
                         text = it,
                         color = errorBackground,

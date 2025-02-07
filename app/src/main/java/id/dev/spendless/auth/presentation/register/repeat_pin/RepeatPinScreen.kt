@@ -50,8 +50,8 @@ import id.dev.spendless.auth.presentation.register.RegisterEvent
 import id.dev.spendless.auth.presentation.register.RegisterState
 import id.dev.spendless.auth.presentation.register.RegisterViewModel
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
-import id.dev.spendless.core.presentation.design_system.component.KeyPad
-import id.dev.spendless.core.presentation.design_system.component.PinDotView
+import id.dev.spendless.core.presentation.design_system.component.pin.KeyPad
+import id.dev.spendless.core.presentation.design_system.component.pin.PinDotView
 import id.dev.spendless.core.presentation.design_system.errorBackground
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
@@ -114,11 +114,11 @@ private fun RepeatPinScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(screenBackground)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(screenBackground)
                 .verticalScroll(rememberScrollState())
                 .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),

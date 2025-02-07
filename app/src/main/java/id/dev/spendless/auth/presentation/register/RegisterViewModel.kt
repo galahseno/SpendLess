@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.presentation.ui.UiText
+import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
+import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
+import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,15 +53,15 @@ class RegisterViewModel(
             is RegisterAction.OnUsernameChanged -> {
                 _state.update { it.copy(username = action.username) }
             }
+
             is RegisterAction.OnInputCreatePin -> handleInputCreatePin(action.pin)
-
             is RegisterAction.OnDeleteCreatePin -> handleDeleteCreatePin()
-
             is RegisterAction.OnResetPin -> handleResetPin()
-
             is RegisterAction.OnInputRepeatPin -> handleInputRepeatPin(action.repeatPin)
-
             is RegisterAction.OnDeleteRepeatPin -> handleDeleteRepeatPin()
+            is RegisterAction.OnExpensesFormatSelected -> handleSelectedExpensesFormat(action.expense)
+            is RegisterAction.OnDecimalSeparatorSelected -> handleSelectedDecimalSeparator(action.separator)
+            is RegisterAction.OnThousandSeparatorSelected -> handleSelectedThousandSeparator(action.separator)
             else -> {}
         }
     }
@@ -119,6 +122,18 @@ class RegisterViewModel(
                 }
             }
         }
+    }
+
+    private fun handleSelectedExpensesFormat(expense: ExpensesFormatEnum) {
+        _state.update { it.copy(selectedExpenseFormat = expense) }
+    }
+
+    private fun handleSelectedDecimalSeparator(separator: DecimalSeparatorEnum) {
+        _state.update { it.copy(selectedDecimalSeparator = separator) }
+    }
+
+    private fun handleSelectedThousandSeparator(separator: ThousandsSeparatorEnum) {
+        _state.update { it.copy(selectedThousandSeparator = separator) }
     }
 
     private fun isValidUsername(username: String): Boolean {

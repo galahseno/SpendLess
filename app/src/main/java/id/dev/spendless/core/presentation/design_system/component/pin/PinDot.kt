@@ -1,4 +1,4 @@
-package id.dev.spendless.core.presentation.design_system.component
+package id.dev.spendless.core.presentation.design_system.component.pin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

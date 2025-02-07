@@ -19,4 +19,12 @@
     <string name="repeat_pin">Repeat Your PIN</string>
     <string name="enter_pin_again">Enter your PIN again</string>
     <string name="pin_not_match">PINs don’t match. Try again</string>
+    <string name="set_spendless_preferences">Set SpendLess\nto your preferences</string>
+    <string name="you_can_change_anytime_in_setting">You can change it at any time in Settings</string>
+    <string name="spend_this_month">spend this month</string>
+    <string name="expenses_format">Expenses format</string>
+    <string name="currency_format">Currency</string>
+    <string name="desimal_separator">Decimal separator</string>
+    <string name="thousand_separator">Thousands separator</string>
+    <string name="start_tracking">Start Tracking!</string>
 </resources>

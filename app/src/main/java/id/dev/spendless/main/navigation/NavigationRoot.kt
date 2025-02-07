@@ -50,7 +50,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             LoginScreenRoot(
                 onNavigateToRegister = {
                     navController.navigate(Screen.Auth.Register) {
-                        popUpTo(Screen.Auth.Login) {
+                        popUpTo<Screen.Auth.Login> {
                             inclusive = true
                             saveState = true
                         }
@@ -67,7 +67,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             RegisterScreenRoot(
                 onNavigateToLogin = {
                     navController.navigate(Screen.Auth.Login) {
-                        popUpTo(Screen.Auth.Register) {
+                        popUpTo<Screen.Auth.Register> {
                             inclusive = true
                             saveState = true
                         }
@@ -116,6 +116,11 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
             OnboardingPreferencesScreenRoot(
+                onBackClick = {
+                    navController.navigate(Screen.Auth.Register.CreatePin) {
+                        popUpTo<Screen.Auth.Register>()
+                    }
+                },
                 viewModel = viewModel
             )
         }
