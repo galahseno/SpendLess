@@ -9,4 +9,9 @@
     <string name="invalid_username">username min 3 character and max 14 character</string>
     <string name="invalid_pin">PIN must be 5 digits</string>
     <string name="invalid_username_space">username cannot contain spaces</string>
+    <string name="welcome_to_spendless">Welcome to SpendLess!</string>
+    <string name="how_can_we_address_you">How can we address you?</string>
+    <string name="create_unique_username">Create unique username</string>
+    <string name="next_register">Next</string>
+    <string name="already_have_acc">Already have an account?</string>
 </resources>

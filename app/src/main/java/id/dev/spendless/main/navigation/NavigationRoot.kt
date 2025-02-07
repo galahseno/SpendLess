@@ -45,13 +45,27 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
         composable<Screen.Auth.Login> {
             LoginScreenRoot(
                 onNavigateToRegister = {
-                    navController.navigate(Screen.Auth.Register)
+                    navController.navigate(Screen.Auth.Register) {
+                        popUpTo(Screen.Auth.Login) {
+                            inclusive = true
+                            saveState = true
+                        }
+                        restoreState = true
+                    }
                 }
             )
         }
         composable<Screen.Auth.Register> {
             RegisterScreenRoot(
-
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Auth.Login) {
+                        popUpTo(Screen.Auth.Register) {
+                            inclusive = true
+                            saveState = true
+                        }
+                        restoreState = true
+                    }
+                }
             )
         }
         composable<Screen.Auth.Register.CreatePin> {

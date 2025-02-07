@@ -20,6 +20,11 @@ val Typography = Typography(
         fontWeight = FontWeight.W400,
         fontSize = 16.sp
     ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.figtree_regular)),
+        fontWeight = FontWeight.W600,
+        fontSize = 36.sp
+    ),
     /* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,

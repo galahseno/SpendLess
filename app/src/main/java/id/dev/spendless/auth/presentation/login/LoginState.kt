@@ -8,5 +8,7 @@ data class LoginState(
     val canLogin: Boolean = false,
     val usernameSupportText: UiText? = null,
     val pinSupportText: UiText? = null,
+    val isErrorVisible: Boolean = false,
+    val errorMessage: UiText? = null
     //
 )
