@@ -2,6 +2,7 @@ package id.dev.spendless.main.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -10,8 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import id.dev.spendless.auth.presentation.login.LoginScreenRoot
 import id.dev.spendless.auth.presentation.register.RegisterScreenRoot
+import id.dev.spendless.auth.presentation.register.RegisterViewModel
 import id.dev.spendless.auth.presentation.register.create_pin.CreatePinScreenRoot
 import id.dev.spendless.auth.presentation.register.onboarding_preferences.OnboardingPreferencesScreenRoot
+import id.dev.spendless.auth.presentation.register.repeat_pin.RepeatPinScreenRoot
 import id.dev.spendless.core.presentation.pin_prompt.PinPromptScreenRoot
 import id.dev.spendless.dashboard.presentation.DashboardScreenRoot
 import id.dev.spendless.settings.presentation.SettingScreenRoot
@@ -20,6 +23,7 @@ import id.dev.spendless.settings.presentation.security.SecurityScreenRoot
 import id.dev.spendless.transaction.presentation.add_transaction.AddTransactionScreenRoot
 import id.dev.spendless.transaction.presentation.all_transaction.AllTransactionScreenRoot
 import id.dev.spendless.transaction.presentation.all_transaction.export.ExportScreenRoot
+import org.koin.androidx.compose.navigation.koinNavViewModel
 
 @Composable
 fun NavigationRoot(
@@ -56,6 +60,10 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
         composable<Screen.Auth.Register> {
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val viewModel: RegisterViewModel =
+                koinNavViewModel(viewModelStoreOwner = backStackEntry)
+
             RegisterScreenRoot(
                 onNavigateToLogin = {
                     navController.navigate(Screen.Auth.Login) {
@@ -65,17 +73,50 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                         }
                         restoreState = true
                     }
-                }
+                },
+                onSuccessCheckUsername = {
+                    navController.navigate(Screen.Auth.Register.CreatePin)
+                },
+                viewModel = viewModel
             )
         }
         composable<Screen.Auth.Register.CreatePin> {
-            CreatePinScreenRoot(
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val viewModel: RegisterViewModel =
+                koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
+            CreatePinScreenRoot(
+                onBackClick = {
+                    navController.navigateUp()
+                },
+                onProcessToRepeatPin = {
+                    navController.navigate(Screen.Auth.Register.RepeatPin)
+                },
+                viewModel = viewModel
+            )
+        }
+        composable<Screen.Auth.Register.RepeatPin> {
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val viewModel: RegisterViewModel =
+                koinNavViewModel(viewModelStoreOwner = backStackEntry)
+
+            RepeatPinScreenRoot(
+                onBackClick = {
+                    navController.navigateUp()
+                },
+                onProcessToOnboardingPreferences = {
+                    navController.navigate(Screen.Auth.Register.OnboardingPreferences)
+                },
+                viewModel = viewModel
             )
         }
         composable<Screen.Auth.Register.OnboardingPreferences> {
-            OnboardingPreferencesScreenRoot(
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val viewModel: RegisterViewModel =
+                koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
+            OnboardingPreferencesScreenRoot(
+                viewModel = viewModel
             )
         }
     }

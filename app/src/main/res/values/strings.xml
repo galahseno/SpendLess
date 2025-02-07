@@ -14,4 +14,9 @@
     <string name="create_unique_username">Create unique username</string>
     <string name="next_register">Next</string>
     <string name="already_have_acc">Already have an account?</string>
+    <string name="create_pin">Create PIN</string>
+    <string name="use_pin_to_login">Use PIN to login to your account</string>
+    <string name="repeat_pin">Repeat Your PIN</string>
+    <string name="enter_pin_again">Enter your PIN again</string>
+    <string name="pin_not_match">PINs don’t match. Try again</string>
 </resources>

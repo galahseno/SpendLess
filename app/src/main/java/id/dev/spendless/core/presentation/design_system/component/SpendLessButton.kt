@@ -43,8 +43,7 @@ fun SpendLessButton(
     ) {
         Text(
             text,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.W600
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
         )
         if (icon != null) {
             Spacer(modifier = Modifier.width(8.dp))

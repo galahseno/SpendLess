@@ -58,10 +58,10 @@ import id.dev.spendless.core.presentation.design_system.errorBackground
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.screenBackground
+import id.dev.spendless.core.presentation.design_system.topPaddingAuthScreen
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -109,13 +109,6 @@ private fun LoginScreen(
         }
     }
 
-    LaunchedEffect(state.isErrorVisible) {
-        if (state.isErrorVisible) {
-            delay(2000)
-            onAction(LoginAction.OnDismissErrorMessage)
-        }
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -125,7 +118,7 @@ private fun LoginScreen(
                 .fillMaxSize()
                 .background(screenBackground)
                 .verticalScroll(rememberScrollState())
-                .padding(top = 88.dp)
+                .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -204,8 +197,7 @@ private fun LoginScreen(
                 Text(
                     color = buttonBackground,
                     text = stringResource(R.string.new_to_spendless),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.W600,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
                 )
             }
         }
@@ -227,10 +219,9 @@ private fun LoginScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = state.errorMessage?.asString() ?: "Something Wrong",
+                    text = state.errorMessage?.asString() ?: "",
                     color = Color.White,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.W500,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500),
                     modifier = Modifier
                         .then(
                             if (keyboardOpen) Modifier

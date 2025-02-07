@@ -15,6 +15,9 @@ sealed class Screen {
             data object CreatePin
 
             @Serializable
+            data object RepeatPin
+
+            @Serializable
             data object OnboardingPreferences
         }
     }

@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,16 +51,16 @@ import id.dev.spendless.core.presentation.design_system.errorBackground
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.screenBackground
+import id.dev.spendless.core.presentation.design_system.topPaddingAuthScreen
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
-import kotlinx.coroutines.delay
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RegisterScreenRoot(
     onNavigateToLogin: () -> Unit,
-    viewModel: RegisterViewModel = koinViewModel()
+    onSuccessCheckUsername: () -> Unit,
+    viewModel: RegisterViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -74,6 +73,8 @@ fun RegisterScreenRoot(
         onAction = { action ->
             when (action) {
                 is RegisterAction.OnLoginClick -> onNavigateToLogin()
+                // TODO Refactor soon impl logic
+                is RegisterAction.OnRegisterNextClick -> onSuccessCheckUsername()
                 else -> {}
             }
             viewModel.onAction(action)
@@ -96,13 +97,6 @@ private fun RegisterScreen(
         label = "anim_error_height"
     )
 
-    LaunchedEffect(state.isErrorVisible) {
-        if (state.isErrorVisible) {
-            delay(2000)
-            onAction(RegisterAction.OnDismissErrorMessage)
-        }
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -112,7 +106,7 @@ private fun RegisterScreen(
                 .fillMaxSize()
                 .background(screenBackground)
                 .verticalScroll(rememberScrollState())
-                .padding(top = 88.dp)
+                .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -158,7 +152,7 @@ private fun RegisterScreen(
                 },
                 onClick = {
                     keyboardController?.hide()
-                    //TODO trigger Next Register
+                    onAction(RegisterAction.OnRegisterNextClick)
                 }
             )
             Spacer(modifier = Modifier.height(14.dp))
@@ -170,8 +164,7 @@ private fun RegisterScreen(
                 Text(
                     color = buttonBackground,
                     text = stringResource(R.string.already_have_acc),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.W600,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W600),
                 )
             }
         }
@@ -193,10 +186,9 @@ private fun RegisterScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = state.errorMessage?.asString() ?: "Something Wrong",
+                    text = state.errorMessage?.asString() ?: "",
                     color = Color.White,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.W500,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500),
                     modifier = Modifier
                         .then(
                             if (keyboardOpen) Modifier

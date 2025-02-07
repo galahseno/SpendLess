@@ -60,10 +60,6 @@ class LoginViewModel(
                 _state.update { it.copy(pin = action.pin) }
             }
 
-            is LoginAction.OnDismissErrorMessage -> {
-                _state.update { it.copy(isErrorVisible = false, errorMessage = null) }
-            }
-
             else -> {}
         }
     }

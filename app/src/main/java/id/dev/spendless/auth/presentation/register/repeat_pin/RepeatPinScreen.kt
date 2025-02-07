@@ -1,5 +1,6 @@
-package id.dev.spendless.auth.presentation.register.create_pin
+package id.dev.spendless.auth.presentation.register.repeat_pin
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
@@ -60,25 +61,34 @@ import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
 
 @Composable
-fun CreatePinScreenRoot(
+fun RepeatPinScreenRoot(
     onBackClick: () -> Unit,
-    onProcessToRepeatPin: () -> Unit,
+    onProcessToOnboardingPreferences: () -> Unit,
     viewModel: RegisterViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
-            is RegisterEvent.OnProcessToRepeatPin -> onProcessToRepeatPin()
+            is RegisterEvent.OnProcessToOnboardingPreferences -> onProcessToOnboardingPreferences()
             else -> {}
         }
     }
 
-    CreatePinScreen(
+    BackHandler {
+        viewModel.onAction(RegisterAction.OnResetPin)
+        onBackClick()
+    }
+
+    RepeatPinScreen(
         state = state,
         onAction = { action ->
             when (action) {
-                is RegisterAction.OnBackClick -> onBackClick()
+                is RegisterAction.OnBackClick -> {
+                    viewModel.onAction(RegisterAction.OnResetPin)
+                    onBackClick()
+                }
+
                 else -> {}
             }
             viewModel.onAction(action)
@@ -88,7 +98,7 @@ fun CreatePinScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CreatePinScreen(
+private fun RepeatPinScreen(
     state: RegisterState,
     onAction: (RegisterAction) -> Unit
 ) {
@@ -100,7 +110,6 @@ private fun CreatePinScreen(
         if (keyboardOpen) errorHeightOpenKeyboard else errorHeightClosedKeyboard,
         label = "anim_error_height"
     )
-
 
     Box(
         modifier = Modifier
@@ -122,16 +131,16 @@ private fun CreatePinScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.create_pin),
+                text = stringResource(R.string.repeat_pin),
                 style = MaterialTheme.typography.headlineMedium
             )
             Text(
-                text = stringResource(R.string.use_pin_to_login),
+                text = stringResource(R.string.enter_pin_again),
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(20.dp))
             PinDotView(
-                pin = state.pin,
+                pin = state.repeatPin,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
@@ -143,10 +152,10 @@ private fun CreatePinScreen(
                 isBiometricEnabled = false,
                 onBiometricClick = {},
                 onDeletePadClick = {
-                    onAction(RegisterAction.OnDeleteCreatePin)
+                    onAction(RegisterAction.OnDeleteRepeatPin)
                 },
                 onNumberPadClick = {
-                    onAction(RegisterAction.OnInputCreatePin(it))
+                    onAction(RegisterAction.OnInputRepeatPin(it))
                 }
             )
         }
@@ -200,14 +209,12 @@ private fun CreatePinScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun CreatePinScreenPreview() {
+private fun RepeatPinScreenPreview() {
     SpendLessTheme {
-        CreatePinScreen(
-            state = RegisterState(
-                pin = "12"
-            ),
+        RepeatPinScreen(
+            state = RegisterState(),
             onAction = {}
         )
     }

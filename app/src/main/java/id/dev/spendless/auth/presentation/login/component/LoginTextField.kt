@@ -53,8 +53,7 @@ fun LoginTextField(
                     Text(
                         text = it,
                         color = errorBackground,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontSize = 14.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 14.sp),
                     )
                 }
             }

@@ -9,12 +9,11 @@ import id.dev.spendless.auth.presentation.register.RegisterState
 import id.dev.spendless.auth.presentation.register.RegisterViewModel
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun OnboardingPreferencesScreenRoot(
 
-    viewModel: RegisterViewModel = koinViewModel()
+    viewModel: RegisterViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
