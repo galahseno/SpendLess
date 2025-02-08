@@ -2,7 +2,8 @@ package id.dev.spendless.core.presentation.design_system.component.preferences
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,10 +39,8 @@ fun ThousandSeparator(
     modifier: Modifier = Modifier,
     onExpensesSelected: (ThousandsSeparatorEnum) -> Unit
 ) {
-    var previousSeparator by remember { mutableStateOf(selectedSeparator) }
-
-    LaunchedEffect(selectedSeparator) {
-        previousSeparator = selectedSeparator
+    var fromSeparator by remember {
+        mutableStateOf(selectedSeparator)
     }
 
     Row(
@@ -59,42 +57,13 @@ fun ThousandSeparator(
                 modifier = Modifier.weight(1f),
                 targetState = selectedSeparator,
                 transitionSpec = {
-                    when (targetState) {
-                        ThousandsSeparatorEnum.Dot -> {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right
-                            ) togetherWith slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right
-                            )
-                        }
-
-                        ThousandsSeparatorEnum.Space -> {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left
-                            ) togetherWith slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left
-                            )
-                        }
-
-                        else -> {
-                            // TODO Fix animation
-                            if (separator == ThousandsSeparatorEnum.Space) slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left
-                            ) togetherWith slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left
-                            )
-                            else if (separator == ThousandsSeparatorEnum.Dot) slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right
-                            ) togetherWith slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right
-                            )
-                            else slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right
-                            ) togetherWith fadeOut()
-                        }
-                    }
+                    getThousandSeparatorTransitionSpec(separator, fromSeparator, targetState)
                 }
             ) {
+                if (this.transition.currentState == this.transition.targetState) {
+                    fromSeparator = selectedSeparator
+                }
+
                 SeparatorBox(
                     text = when (separator) {
                         ThousandsSeparatorEnum.Dot -> "1.000"
@@ -120,7 +89,6 @@ private fun SeparatorBox(
     onSeparatorSelected: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // TODO Animated selected background only
     Box(
         modifier = modifier
             .height(40.dp)
@@ -141,6 +109,127 @@ private fun SeparatorBox(
             text = text,
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 16.sp)
         )
+    }
+}
+
+private fun AnimatedContentTransitionScope<ThousandsSeparatorEnum>.getThousandSeparatorTransitionSpec(
+    separator: ThousandsSeparatorEnum,
+    fromSeparator: ThousandsSeparatorEnum,
+    targetState: ThousandsSeparatorEnum
+) = when {
+    /**
+     * If the separator is Dot and target is Comma and fromSeparator is Dot
+     **/
+    separator == ThousandsSeparatorEnum.Dot && targetState == ThousandsSeparatorEnum.Comma
+            && fromSeparator == ThousandsSeparatorEnum.Dot -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        )
+    }
+    /**
+     * If the separator is Dot and target is Dot and fromSeparator is Comma
+     **/
+    separator == ThousandsSeparatorEnum.Dot && targetState == ThousandsSeparatorEnum.Dot
+            && fromSeparator == ThousandsSeparatorEnum.Comma -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the separator is Dot and target is Dot and fromSeparator is Space
+     **/
+    separator == ThousandsSeparatorEnum.Dot && targetState == ThousandsSeparatorEnum.Dot
+            && fromSeparator == ThousandsSeparatorEnum.Space -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the separator is Dot and target is Space and fromSeparator is Dot
+     **/
+    separator == ThousandsSeparatorEnum.Dot && targetState == ThousandsSeparatorEnum.Space
+            && fromSeparator == ThousandsSeparatorEnum.Dot -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        )
+    }
+    /**
+     * If the separator is Comma and target is Space and fromSeparator is Comma
+     **/
+    separator == ThousandsSeparatorEnum.Comma && targetState == ThousandsSeparatorEnum.Space
+            && fromSeparator == ThousandsSeparatorEnum.Comma -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        )
+    }
+    /**
+     * If the separator is Comma and target is Comma and fromSeparator is Dot
+     **/
+    separator == ThousandsSeparatorEnum.Comma && targetState == ThousandsSeparatorEnum.Comma
+            && fromSeparator == ThousandsSeparatorEnum.Dot -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the separator is Comma and target is Comma and fromSeparator is Space
+     **/
+    separator == ThousandsSeparatorEnum.Comma && targetState == ThousandsSeparatorEnum.Comma
+            && fromSeparator == ThousandsSeparatorEnum.Space -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the separator is Comma and target is Dot and fromSeparator is Comma
+     **/
+    separator == ThousandsSeparatorEnum.Comma && targetState == ThousandsSeparatorEnum.Dot
+            && fromSeparator == ThousandsSeparatorEnum.Comma -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        )
+    }
+    /**
+     * If the separator is Space and target is Dot and fromSeparator is Space
+     **/
+    separator == ThousandsSeparatorEnum.Space && targetState == ThousandsSeparatorEnum.Dot
+            && fromSeparator == ThousandsSeparatorEnum.Space -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        )
+    }
+    /**
+     * If the separator is Space and target is Space and fromSeparator is Comma
+     **/
+    separator == ThousandsSeparatorEnum.Space && targetState == ThousandsSeparatorEnum.Space
+            && fromSeparator == ThousandsSeparatorEnum.Comma -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the separator is Space and target is Space and fromSeparator is Dot
+     **/
+    separator == ThousandsSeparatorEnum.Space && targetState == ThousandsSeparatorEnum.Space
+            && fromSeparator == ThousandsSeparatorEnum.Dot -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        )  togetherWith ExitTransition.None
+    }
+    /**
+     * If the separator is Space and target is Comma and fromSeparator is Space
+     **/
+    separator == ThousandsSeparatorEnum.Space && targetState == ThousandsSeparatorEnum.Comma
+            && fromSeparator == ThousandsSeparatorEnum.Space -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        )
+    }
+
+
+    // Default case
+    else -> {
+        EnterTransition.None togetherWith ExitTransition.None
     }
 }
 

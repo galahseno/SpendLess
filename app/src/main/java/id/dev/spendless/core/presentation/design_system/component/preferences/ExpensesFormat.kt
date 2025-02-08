@@ -2,6 +2,8 @@ package id.dev.spendless.core.presentation.design_system.component.preferences
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,19 +50,7 @@ fun ExpensesFormat(
                 modifier = Modifier.weight(1f),
                 targetState = selectedExpenseFormat,
                 transitionSpec = {
-                    if (targetState == ExpensesFormatEnum.MinusPrefix) {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left
-                        ) togetherWith slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left
-                        )
-                    } else {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right
-                        ) togetherWith slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right
-                        )
-                    }
+                    getExpensesFormatTransitionSpec(expensesFormat, targetState)
                 }
             ) {
                 ExpensesBox(
@@ -85,8 +75,6 @@ private fun ExpensesBox(
     onExpensesSelected: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // TODO Animated selected background only
-
     Box(
         modifier = modifier
             .height(40.dp)
@@ -107,6 +95,44 @@ private fun ExpensesBox(
             text = text,
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 16.sp)
         )
+    }
+}
+
+private fun AnimatedContentTransitionScope<ExpensesFormatEnum>.getExpensesFormatTransitionSpec(
+    expensesFormat: ExpensesFormatEnum,
+    targetState: ExpensesFormatEnum
+) = when {
+    /**
+     * If the expensesFormat is MinusPrefix and target is RoundBrackets
+     **/
+    expensesFormat == ExpensesFormatEnum.MinusPrefix && targetState == ExpensesFormatEnum.RoundBrackets -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        )
+    }
+    /**
+     * If the expensesFormat is MinusPrefix
+     **/
+    expensesFormat == ExpensesFormatEnum.MinusPrefix -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the target is MinusPrefix
+     **/
+    targetState == ExpensesFormatEnum.MinusPrefix -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        )
+    }
+    /**
+     * Default Case
+     **/
+    else -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        ) togetherWith ExitTransition.None
     }
 }
 

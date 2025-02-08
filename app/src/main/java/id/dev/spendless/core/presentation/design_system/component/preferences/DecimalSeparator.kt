@@ -2,6 +2,8 @@ package id.dev.spendless.core.presentation.design_system.component.preferences
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,19 +49,7 @@ fun DecimalSeparator(
                 modifier = Modifier.weight(1f),
                 targetState = selectedSeparator,
                 transitionSpec = {
-                    if (targetState == DecimalSeparatorEnum.Dot) {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left
-                        ) togetherWith slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left
-                        )
-                    } else {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right
-                        ) togetherWith slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right
-                        )
-                    }
+                    getDecimalSeparatorTransitionSpec(separator, targetState)
                 }
             ) {
                 SeparatorBox(
@@ -84,7 +74,6 @@ private fun SeparatorBox(
     onSeparatorSelected: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // TODO Animated selected background only
     Box(
         modifier = modifier
             .height(40.dp)
@@ -105,6 +94,45 @@ private fun SeparatorBox(
             text = text,
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 16.sp)
         )
+    }
+}
+
+private fun AnimatedContentTransitionScope<DecimalSeparatorEnum>.getDecimalSeparatorTransitionSpec(
+    separator: DecimalSeparatorEnum,
+    targetState: DecimalSeparatorEnum
+) = when {
+    /**
+     * If the separator is Dot and target is Comma
+     **/
+    separator == DecimalSeparatorEnum.Dot && targetState == DecimalSeparatorEnum.Comma -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        )
+    }
+
+    /**
+     * If the separator is Dot
+     **/
+    separator == DecimalSeparatorEnum.Dot -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        ) togetherWith ExitTransition.None
+    }
+    /**
+     * If the target is Dot
+     **/
+    targetState == DecimalSeparatorEnum.Dot -> {
+        EnterTransition.None togetherWith slideOutOfContainer(
+            AnimatedContentTransitionScope.SlideDirection.Left
+        )
+    }
+    /**
+     * Default Case
+     **/
+    else -> {
+        slideIntoContainer(
+            AnimatedContentTransitionScope.SlideDirection.Right
+        ) togetherWith ExitTransition.None
     }
 }
 
