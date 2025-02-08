@@ -1,5 +1,6 @@
 package id.dev.spendless.auth.presentation.register
 
+import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
 import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
@@ -18,6 +19,7 @@ sealed interface RegisterAction {
     data class OnInputRepeatPin(val repeatPin: String) : RegisterAction
 
     data class OnExpensesFormatSelected(val expense: ExpensesFormatEnum) : RegisterAction
+    data class OnCurrencySelected(val currency: CurrencyEnum) : RegisterAction
     data class OnDecimalSeparatorSelected(val separator: DecimalSeparatorEnum) : RegisterAction
     data class OnThousandSeparatorSelected(val separator: ThousandsSeparatorEnum) : RegisterAction
 }

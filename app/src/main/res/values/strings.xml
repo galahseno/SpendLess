@@ -27,4 +27,5 @@
     <string name="desimal_separator">Decimal separator</string>
     <string name="thousand_separator">Thousands separator</string>
     <string name="start_tracking">Start Tracking!</string>
+    <string name="invalid_separator">Decimal and Thousand can\'t same separator</string>
 </resources>

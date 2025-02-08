@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.presentation.ui.UiText
+import id.dev.spendless.core.presentation.ui.formatTotalSpend
+import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
 import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
@@ -46,6 +48,15 @@ class RegisterViewModel(
                 }
             }
             .launchIn(viewModelScope)
+
+        _state
+            .map { it.selectedDecimalSeparator to it.selectedThousandSeparator }
+            .distinctUntilChanged()
+            .onEach { (decimal, thousand) ->
+                _state.update { it.copy(canProsesRegister = decimal.name != thousand.name) }
+
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onAction(action: RegisterAction) {
@@ -60,6 +71,7 @@ class RegisterViewModel(
             is RegisterAction.OnInputRepeatPin -> handleInputRepeatPin(action.repeatPin)
             is RegisterAction.OnDeleteRepeatPin -> handleDeleteRepeatPin()
             is RegisterAction.OnExpensesFormatSelected -> handleSelectedExpensesFormat(action.expense)
+            is RegisterAction.OnCurrencySelected -> handleSelectedCurrency(action.currency)
             is RegisterAction.OnDecimalSeparatorSelected -> handleSelectedDecimalSeparator(action.separator)
             is RegisterAction.OnThousandSeparatorSelected -> handleSelectedThousandSeparator(action.separator)
             else -> {}
@@ -117,23 +129,95 @@ class RegisterViewModel(
             }
             viewModelScope.launch {
                 delay(2000)
-                _state.update {
-                    it.copy(isErrorVisible = false)
-                }
+                _state.update { it.copy(isErrorVisible = false) }
             }
         }
     }
 
     private fun handleSelectedExpensesFormat(expense: ExpensesFormatEnum) {
-        _state.update { it.copy(selectedExpenseFormat = expense) }
+        _state.update {
+            it.copy(
+                selectedExpenseFormat = expense,
+                formattedTotalSpend = it.totalSpend.formatTotalSpend(
+                    expense,
+                    it.selectedCurrency,
+                    it.selectedDecimalSeparator,
+                    it.selectedThousandSeparator
+                )
+            )
+        }
+    }
+
+    private fun handleSelectedCurrency(currency: CurrencyEnum) {
+        _state.update {
+            it.copy(
+                selectedCurrency = currency,
+                formattedTotalSpend = it.totalSpend.formatTotalSpend(
+                    it.selectedExpenseFormat,
+                    currency,
+                    it.selectedDecimalSeparator,
+                    it.selectedThousandSeparator
+                )
+            )
+        }
     }
 
     private fun handleSelectedDecimalSeparator(separator: DecimalSeparatorEnum) {
-        _state.update { it.copy(selectedDecimalSeparator = separator) }
+        val isSameSeparator = separator.name == _state.value.selectedThousandSeparator.name
+
+        if (isSameSeparator && !_state.value.isErrorVisible) {
+            _state.update {
+                it.copy(
+                    isErrorVisible = true,
+                    errorMessage = UiText.StringResource(R.string.invalid_separator)
+                )
+            }
+            viewModelScope.launch {
+                delay(2000)
+                _state.update { it.copy(isErrorVisible = false) }
+            }
+        }
+
+        _state.update {
+            it.copy(
+                selectedDecimalSeparator = separator,
+                formattedTotalSpend = it.totalSpend.takeIf { !isSameSeparator }?.formatTotalSpend(
+                    it.selectedExpenseFormat,
+                    it.selectedCurrency,
+                    separator,
+                    it.selectedThousandSeparator
+                ) ?: it.formattedTotalSpend
+            )
+        }
     }
 
     private fun handleSelectedThousandSeparator(separator: ThousandsSeparatorEnum) {
-        _state.update { it.copy(selectedThousandSeparator = separator) }
+        val isSameSeparator = separator.name == _state.value.selectedDecimalSeparator.name
+
+        if (isSameSeparator && !_state.value.isErrorVisible) {
+            _state.update {
+                it.copy(
+                    isErrorVisible = true,
+                    errorMessage = UiText.StringResource(R.string.invalid_separator)
+                )
+            }
+            viewModelScope.launch {
+                delay(2000)
+                _state.update { it.copy(isErrorVisible = false) }
+            }
+        }
+
+        _state.update {
+            it.copy(
+                selectedThousandSeparator = separator,
+                formattedTotalSpend = it.totalSpend.takeIf { !isSameSeparator }?.formatTotalSpend(
+                    it.selectedExpenseFormat,
+                    it.selectedCurrency,
+                    it.selectedDecimalSeparator,
+                    separator,
+                ) ?: it.formattedTotalSpend
+            )
+        }
     }
 
     private fun isValidUsername(username: String): Boolean {
