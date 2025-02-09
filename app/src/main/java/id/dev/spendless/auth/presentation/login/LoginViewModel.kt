@@ -59,7 +59,9 @@ class LoginViewModel(
             is LoginAction.OnPINChanged -> {
                 _state.update { it.copy(pin = action.pin) }
             }
-
+            is LoginAction.OnLoginClick -> {
+                // TODO Handle Login
+            }
             else -> {}
         }
     }

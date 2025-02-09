@@ -64,6 +64,7 @@ import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
 fun RepeatPinScreenRoot(
     onBackClick: () -> Unit,
     onProcessToOnboardingPreferences: () -> Unit,
+    onSuccessRegister: () -> Unit,
     viewModel: RegisterViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -71,6 +72,7 @@ fun RepeatPinScreenRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             is RegisterEvent.OnProcessToOnboardingPreferences -> onProcessToOnboardingPreferences()
+            is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
             else -> {}
         }
     }

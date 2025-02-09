@@ -28,4 +28,6 @@
     <string name="thousand_separator">Thousands separator</string>
     <string name="start_tracking">Start Tracking!</string>
     <string name="invalid_separator">Decimal and Thousand can\'t same separator</string>
+    <string name="username_exists">This username has already been taken!</string>
+    <string name="error_proses">Something Wrong, try again later!</string>
 </resources>

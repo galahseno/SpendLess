@@ -1,10 +1,10 @@
-package id.dev.spendless.core.data.db.entity
+package id.dev.spendless.core.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "category")
-data class Category(
+data class CategoryEntity(
     @PrimaryKey
     val categoryId: Int,
     val name: String,

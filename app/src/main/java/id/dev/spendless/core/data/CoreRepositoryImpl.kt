@@ -4,5 +4,6 @@ import id.dev.spendless.core.domain.CoreRepository
 
 class CoreRepositoryImpl(
 
-): CoreRepository {
+) : CoreRepository {
+
 }

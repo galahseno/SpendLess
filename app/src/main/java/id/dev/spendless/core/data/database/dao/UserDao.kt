@@ -1,0 +1,16 @@
+package id.dev.spendless.core.data.database.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import id.dev.spendless.core.data.database.entity.UserEntity
+
+@Dao
+interface UserDao {
+    @Query("Select Exists(Select * From user Where username = :username)")
+    suspend fun isUserExist(username: String): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun createUser(user: UserEntity): Long
+}

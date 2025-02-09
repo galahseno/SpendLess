@@ -1,5 +1,6 @@
 package id.dev.spendless.dashboard.presentation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,7 +31,7 @@ private fun DashboardScreen(
     state: DashboardState,
     onAction: (DashboardAction) -> Unit
 ) {
-
+    Text("Dashboard")
 }
 
 @Preview(showBackground = true)

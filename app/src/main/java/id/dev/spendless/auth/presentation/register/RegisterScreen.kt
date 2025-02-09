@@ -60,12 +60,17 @@ import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
 fun RegisterScreenRoot(
     onNavigateToLogin: () -> Unit,
     onSuccessCheckUsername: () -> Unit,
+    onSuccessRegister: () -> Unit,
     viewModel: RegisterViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ObserveAsEvents(viewModel.event) {
-
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            is RegisterEvent.OnProcessUsernameExists -> onSuccessCheckUsername()
+            is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
+            else -> {}
+        }
     }
 
     RegisterScreen(
@@ -73,8 +78,6 @@ fun RegisterScreenRoot(
         onAction = { action ->
             when (action) {
                 is RegisterAction.OnLoginClick -> onNavigateToLogin()
-                // TODO Refactor soon impl logic
-                is RegisterAction.OnRegisterNextClick -> onSuccessCheckUsername()
                 else -> {}
             }
             viewModel.onAction(action)

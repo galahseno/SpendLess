@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.dev.spendless.R
 import id.dev.spendless.auth.presentation.register.RegisterAction
+import id.dev.spendless.auth.presentation.register.RegisterEvent
 import id.dev.spendless.auth.presentation.register.RegisterState
 import id.dev.spendless.auth.presentation.register.RegisterViewModel
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
@@ -64,12 +65,16 @@ import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
 @Composable
 fun OnboardingPreferencesScreenRoot(
     onBackClick: () -> Unit,
+    onSuccessRegister: () -> Unit,
     viewModel: RegisterViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ObserveAsEvents(viewModel.event) {
-
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
+            else -> {}
+        }
     }
 
     BackHandler {
@@ -196,7 +201,7 @@ private fun OnboardingPreferencesScreen(
                 enable = state.canProsesRegister,
                 text = stringResource(R.string.start_tracking),
                 onClick = {
-
+                    onAction(RegisterAction.OnRegisterAccount)
                 }
             )
         }

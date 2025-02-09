@@ -1,10 +1,10 @@
-package id.dev.spendless.core.data.db.entity
+package id.dev.spendless.core.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "transactions")
-data class Transaction(
+data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val transactionId: Int,
     val userId: Int,

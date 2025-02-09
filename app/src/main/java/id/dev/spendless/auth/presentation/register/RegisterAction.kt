@@ -22,4 +22,6 @@ sealed interface RegisterAction {
     data class OnCurrencySelected(val currency: CurrencyEnum) : RegisterAction
     data class OnDecimalSeparatorSelected(val separator: DecimalSeparatorEnum) : RegisterAction
     data class OnThousandSeparatorSelected(val separator: ThousandsSeparatorEnum) : RegisterAction
+
+    data object OnRegisterAccount : RegisterAction
 }

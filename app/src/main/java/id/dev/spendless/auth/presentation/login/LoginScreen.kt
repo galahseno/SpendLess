@@ -71,17 +71,20 @@ fun LoginScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ObserveAsEvents(viewModel.event) {
+    ObserveAsEvents(viewModel.event) { event ->
 
     }
 
-    LoginScreen(state = state, onAction = { action ->
-        when (action) {
-            is LoginAction.OnRegisterClick -> onNavigateToRegister()
-            else -> {}
+    LoginScreen(
+        state = state,
+        onAction = { action ->
+            when (action) {
+                is LoginAction.OnRegisterClick -> onNavigateToRegister()
+                else -> {}
+            }
+            viewModel.onAction(action)
         }
-        viewModel.onAction(action)
-    })
+    )
 }
 
 @Composable
@@ -175,7 +178,7 @@ private fun LoginScreen(
                 keyboardActions = KeyboardActions(
                     onGo = {
                         keyboardController?.hide()
-                        //TODO trigger LOGIN
+                        onAction(LoginAction.OnLoginClick)
                     }
                 )
             )
@@ -185,7 +188,7 @@ private fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.log_in),
                 onClick = {
-                    //TODO trigger LOGIN
+                    onAction(LoginAction.OnLoginClick)
                 }
             )
             Spacer(modifier = Modifier.height(14.dp))
@@ -239,7 +242,6 @@ private fun LoginScreenPreview() {
     SpendLessTheme {
         LoginScreen(
             state = LoginState(
-                isErrorVisible = true,
                 errorMessage = UiText.DynamicString("Something Wrong")
             ),
             onAction = {})

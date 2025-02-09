@@ -13,18 +13,31 @@ class SettingPreferences(private val dataStore: DataStore<Preferences>) {
 
     fun getUserSession(): Flow<String> {
         return dataStore.data.map { preferences ->
-            preferences[USER_KEY] ?: ""
+            preferences[USER_NAME_KEY] ?: ""
         }
     }
 
-    suspend fun saveUserSession(username: String) {
+    suspend fun saveUserSession(
+        userId: Int,
+        username: String,
+        expensesFormat: String,
+        currencySymbol: String,
+        decimalSeparator: String,
+        thousandSeparator: String
+    ) {
         dataStore.edit { preferences ->
-            preferences[USER_KEY] = username
+            preferences[USER_ID_KEY] = userId
+            preferences[USER_NAME_KEY] = username
+            preferences[EXPENSES_FORMAT_KEY] = expensesFormat
+            preferences[CURRENCY_KEY] = currencySymbol
+            preferences[DECIMAL_SEPARATOR_KEY] = decimalSeparator
+            preferences[THOUSAND_SEPARATOR_KEY] = thousandSeparator
         }
     }
 
     private companion object {
-        val USER_KEY = stringPreferencesKey("user_session")
+        val USER_ID_KEY = intPreferencesKey("user_id")
+        val USER_NAME_KEY = stringPreferencesKey("user_name")
         val EXPENSES_FORMAT_KEY = stringPreferencesKey("expenses_format")
         val CURRENCY_KEY = stringPreferencesKey("Currency")
         val DECIMAL_SEPARATOR_KEY = stringPreferencesKey("decimal_separator")

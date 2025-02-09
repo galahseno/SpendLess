@@ -1,12 +1,12 @@
-package id.dev.spendless.core.data.db.entity
+package id.dev.spendless.core.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "user")
-data class User(
+data class UserEntity(
     @PrimaryKey(autoGenerate = true)
-    val userId: Int,
+    val userId: Int = 0,
     val username: String,
-    val pin: Int
+    val pin: String
 )

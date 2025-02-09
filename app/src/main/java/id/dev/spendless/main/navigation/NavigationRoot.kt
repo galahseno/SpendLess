@@ -77,6 +77,13 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 onSuccessCheckUsername = {
                     navController.navigate(Screen.Auth.Register.CreatePin)
                 },
+                onSuccessRegister = {
+                    navController.navigate(Screen.Home.Dashboard) {
+                        popUpTo<Screen.Auth> {
+                            inclusive = true
+                        }
+                    }
+                },
                 viewModel = viewModel
             )
         }
@@ -91,6 +98,13 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 },
                 onProcessToRepeatPin = {
                     navController.navigate(Screen.Auth.Register.RepeatPin)
+                },
+                onSuccessRegister = {
+                    navController.navigate(Screen.Home.Dashboard) {
+                        popUpTo<Screen.Auth> {
+                            inclusive = true
+                        }
+                    }
                 },
                 viewModel = viewModel
             )
@@ -107,6 +121,13 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 onProcessToOnboardingPreferences = {
                     navController.navigate(Screen.Auth.Register.OnboardingPreferences)
                 },
+                onSuccessRegister = {
+                    navController.navigate(Screen.Home.Dashboard) {
+                        popUpTo<Screen.Auth> {
+                            inclusive = true
+                        }
+                    }
+                },
                 viewModel = viewModel
             )
         }
@@ -119,6 +140,13 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 onBackClick = {
                     navController.navigate(Screen.Auth.Register.CreatePin) {
                         popUpTo<Screen.Auth.Register>()
+                    }
+                },
+                onSuccessRegister = {
+                    navController.navigate(Screen.Home.Dashboard) {
+                        popUpTo<Screen.Auth> {
+                            inclusive = true
+                        }
                     }
                 },
                 viewModel = viewModel
