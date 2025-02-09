@@ -7,8 +7,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import id.dev.spendless.core.data.CoreRepositoryImpl
 import id.dev.spendless.core.data.database.SpendLessDb
-import id.dev.spendless.core.data.pref.SettingPreferences
+import id.dev.spendless.core.data.database.SpendLessDbPassphrase
+import id.dev.spendless.core.data.pref.SettingPreferencesImpl
 import id.dev.spendless.core.domain.CoreRepository
+import id.dev.spendless.core.domain.SettingPreferences
+import net.sqlcipher.database.SupportFactory
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -23,15 +26,19 @@ val coreDataModule = module {
     singleOf(::CoreRepositoryImpl).bind<CoreRepository>()
 
     single { androidContext().dataStore }
-    singleOf(::SettingPreferences)
+    singleOf(::SettingPreferencesImpl).bind<SettingPreferences>()
+
+    singleOf(::SpendLessDbPassphrase)
 
     single {
-        // TODO Encrypt database
+        val supportFactory = SupportFactory(get<SpendLessDbPassphrase>().getPassphrase())
         Room.databaseBuilder(
             androidApplication(),
             SpendLessDb::class.java,
-            "story.db"
+            "spendless.db"
         )
+            // TODO uncomment to enable encryption
+            //.openHelperFactory(supportFactory)
             .build()
     }
     single { get<SpendLessDb>().categoryDao() }

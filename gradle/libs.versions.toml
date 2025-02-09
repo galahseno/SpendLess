@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+androidDatabaseSqlcipher = "4.5.3"
 datastorePreferences = "1.1.2"
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
@@ -16,11 +17,14 @@ navigationCompose = "2.8.6"
 kotlinx-serialization = "1.8.0"
 roomRuntime = "2.6.1"
 glance="1.1.1"
+securityCrypto = "1.0.0"
 
 [libraries]
+android-database-sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "androidDatabaseSqlcipher" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

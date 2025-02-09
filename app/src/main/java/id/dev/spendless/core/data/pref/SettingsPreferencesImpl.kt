@@ -6,18 +6,21 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import id.dev.spendless.core.domain.SettingPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class SettingPreferences(private val dataStore: DataStore<Preferences>) {
+class SettingPreferencesImpl(
+    private val dataStore: DataStore<Preferences>
+) : SettingPreferences {
 
-    fun getUserSession(): Flow<String> {
+    override fun getUserSession(): Flow<Int> {
         return dataStore.data.map { preferences ->
-            preferences[USER_NAME_KEY] ?: ""
+            preferences[USER_ID_KEY] ?: -1
         }
     }
 
-    suspend fun saveUserSession(
+    override suspend fun saveRegisterSession(
         userId: Int,
         username: String,
         expensesFormat: String,
@@ -32,6 +35,16 @@ class SettingPreferences(private val dataStore: DataStore<Preferences>) {
             preferences[CURRENCY_KEY] = currencySymbol
             preferences[DECIMAL_SEPARATOR_KEY] = decimalSeparator
             preferences[THOUSAND_SEPARATOR_KEY] = thousandSeparator
+        }
+    }
+
+    override suspend fun saveLoginSession(
+        userId: Int,
+        username: String,
+    ) {
+        dataStore.edit { preferences ->
+            preferences[USER_ID_KEY] = userId
+            preferences[USER_NAME_KEY] = username
         }
     }
 

@@ -13,4 +13,7 @@ interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun createUser(user: UserEntity): Long
+
+    @Query("Select * From user Where username = :username And pin = :pin")
+    suspend fun loginAccount(username: String, pin: String): UserEntity?
 }

@@ -28,10 +28,11 @@ import org.koin.androidx.compose.navigation.koinNavViewModel
 @Composable
 fun NavigationRoot(
     navController: NavHostController,
+    isLoggedIn: Boolean,
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Auth,
+        startDestination = if (isLoggedIn) Screen.Home else Screen.Auth,
         modifier = Modifier.fillMaxSize()
     ) {
         authGraph(navController)
@@ -56,7 +57,14 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                         }
                         restoreState = true
                     }
-                }
+                },
+                onSuccessLogin = {
+                    navController.navigate(Screen.Home.Dashboard) {
+                        popUpTo<Screen.Auth> {
+                            inclusive = true
+                        }
+                    }
+                },
             )
         }
         composable<Screen.Auth.Register> {

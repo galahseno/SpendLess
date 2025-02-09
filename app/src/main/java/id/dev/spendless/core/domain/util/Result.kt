@@ -1,4 +1,4 @@
-package id.dev.spendless.core.domain
+package id.dev.spendless.core.domain.util
 
 typealias RootError = Error
 

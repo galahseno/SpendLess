@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.auth.domain.AuthRepository
-import id.dev.spendless.core.domain.DataError
-import id.dev.spendless.core.domain.Result
+import id.dev.spendless.core.domain.util.DataError
+import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.formatTotalSpend
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
