@@ -16,8 +16,10 @@ fun String.formatTotalSpend(
     thousands: ThousandsSeparatorEnum
 ): String {
     val number = this.toDoubleOrNull() ?: 0.0
+    val isNegative = number < 0
+    val absoluteNumber = kotlin.math.abs(number)
     val decimalPart = this.substringAfter(".", "")
-    val integerPart = number.toInt()
+    val integerPart = absoluteNumber.toInt()
 
     val decimalFormatSymbols = DecimalFormatSymbols(Locale.ROOT)
     decimalFormatSymbols.groupingSeparator = when (thousands) {
@@ -36,9 +38,10 @@ fun String.formatTotalSpend(
 
     return buildString {
         append(
-            when (expensesFormat) {
-                ExpensesFormatEnum.MinusPrefix -> "-"
-                ExpensesFormatEnum.RoundBrackets -> "("
+            when {
+                expensesFormat == ExpensesFormatEnum.MinusPrefix && isNegative -> "-"
+                expensesFormat == ExpensesFormatEnum.RoundBrackets -> "("
+                else -> ""
             }
         )
         append(currency.symbol)

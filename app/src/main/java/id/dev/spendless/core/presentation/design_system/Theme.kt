@@ -1,6 +1,5 @@
 package id.dev.spendless.core.presentation.design_system
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable

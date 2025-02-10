@@ -169,7 +169,9 @@ private fun NavGraphBuilder.homeGraph(navController: NavHostController) {
     ) {
         composable<Screen.Home.Dashboard> {
             DashboardScreenRoot(
-
+                onNavigateToAllTransaction = {
+                    navController.navigate(Screen.Transaction.AllTransaction)
+                },
             )
         }
     }
@@ -193,7 +195,9 @@ private fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
     ) {
         composable<Screen.Transaction.AllTransaction> {
             AllTransactionScreenRoot(
-
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
         composable<Screen.Transaction.AllTransaction.Export> {

@@ -10,20 +10,26 @@ import id.dev.spendless.R
 
 // Set of Material typography styles to start with
 val Typography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.figtree_semibold)),
+        fontWeight = FontWeight.W600,
+        fontSize =  45.sp,
+        lineHeight = 52.sp
+    ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily(Font(R.font.figtree_semibold)),
         fontWeight = FontWeight.W600,
         fontSize =  28.sp,
     ),
-    titleMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.figtree_regular)),
-        fontWeight = FontWeight.W400,
-        fontSize = 16.sp
-    ),
     titleLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.figtree_regular)),
         fontWeight = FontWeight.W600,
         fontSize = 36.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.figtree_regular)),
+        fontWeight = FontWeight.W400,
+        fontSize = 16.sp
     ),
     /* Other default text styles to override
     titleLarge = TextStyle(

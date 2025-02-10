@@ -11,6 +11,7 @@ import id.dev.spendless.main.di.appModule
 import id.dev.spendless.settings.data.di.settingsDataModule
 import id.dev.spendless.settings.presentation.di.settingsPresentationModule
 import id.dev.spendless.transaction.data.di.transactionDataModule
+import id.dev.spendless.transaction.presentation.di.transactionPresentationModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
@@ -34,7 +35,7 @@ class SpendLessApp: Application() {
                 dashboardDataModule,
                 dashboardPresentationModule,
                 transactionDataModule,
-                transactionDataModule,
+                transactionPresentationModule,
                 settingsDataModule,
                 settingsPresentationModule
             )

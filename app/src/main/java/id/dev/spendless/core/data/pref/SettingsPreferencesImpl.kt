@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.model.UserSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -14,9 +15,21 @@ class SettingPreferencesImpl(
     private val dataStore: DataStore<Preferences>
 ) : SettingPreferences {
 
-    override fun getUserSession(): Flow<Int> {
+    override fun getUserStatus(): Flow<Int> {
         return dataStore.data.map { preferences ->
             preferences[USER_ID_KEY] ?: -1
+        }
+    }
+
+    override fun getUserSession(): Flow<UserSession> {
+        return dataStore.data.map {
+            UserSession(
+                username = it[USER_NAME_KEY] ?: "",
+                expensesFormat = it[EXPENSES_FORMAT_KEY] ?: "",
+                currencySymbol = it[CURRENCY_KEY] ?: "",
+                decimalSeparator = it[DECIMAL_SEPARATOR_KEY] ?: "",
+                thousandSeparator = it[THOUSAND_SEPARATOR_KEY] ?: "",
+            )
         }
     }
 
