@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Backspace
+import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -18,12 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import id.dev.spendless.R
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.keyPadBackground
 
@@ -108,8 +108,9 @@ private fun DeleteButton(
         containerColor = keyPadBackground.copy(alpha = 0.3f),
         content = {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.delete_pad),
-                contentDescription = "delete_pad"
+                imageVector = Icons.AutoMirrored.Rounded.Backspace,
+                contentDescription = "delete_pad",
+                modifier = Modifier.size(34.dp),
             )
         }
     )
@@ -130,7 +131,8 @@ private fun BiometricButton(
         content = {
             if (isBiometricEnabled) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.biometric_pad),
+                    imageVector = Icons.Rounded.Fingerprint,
+                    modifier = Modifier.size(34.dp),
                     contentDescription = "biometric_pad"
                 )
             }

@@ -6,16 +6,13 @@ import id.dev.spendless.core.data.database.entity.UserEntity
 import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.joinAll
 import kotlin.coroutines.coroutineContext
 
 class AuthRepositoryImpl(
     private val settingPreferences: SettingPreferences,
     private val userDao: UserDao,
-    private val applicationScope: CoroutineScope,
 ) : AuthRepository {
     override suspend fun checkUsernameExists(username: String): Result<Unit, DataError.Local> {
         try {
@@ -40,25 +37,22 @@ class AuthRepositoryImpl(
         thousandSeparator: String
     ): Result<Unit, DataError.Local> {
         try {
-            val userId = applicationScope.async {
-                val userEntity = UserEntity(username = username, pin = pin)
-                userDao.createUser(userEntity)
-            }.await()
+            val userEntity = UserEntity(username = username, pin = pin)
+            val userId = userDao.createUser(userEntity)
 
             if (userId == -1L) {
                 return Result.Error(DataError.Local.ERROR_PROSES)
             }
 
-            applicationScope.launch {
-                settingPreferences.saveRegisterSession(
-                    userId = userId.toInt(),
-                    username = username,
-                    expensesFormat = expensesFormat,
-                    currencySymbol = currencySymbol,
-                    decimalSeparator = decimalSeparator,
-                    thousandSeparator = thousandSeparator
-                )
-            }.join()
+            settingPreferences.saveRegisterSession(
+                userId = userId.toInt(),
+                username = username,
+                expensesFormat = expensesFormat,
+                currencySymbol = currencySymbol,
+                decimalSeparator = decimalSeparator,
+                thousandSeparator = thousandSeparator
+            )
+            joinAll()
 
             return Result.Success(Unit)
 
@@ -74,28 +68,20 @@ class AuthRepositoryImpl(
         pin: String
     ): Result<Unit, DataError.Local> {
         try {
-            val isUserExist = applicationScope.async {
-                userDao.isUserExist(username)
-            }.await()
+            val isUserExist = userDao.isUserExist(username)
 
             if (!isUserExist) {
                 return Result.Error(DataError.Local.USER_NOT_EXIST)
             }
 
-            val userEntity = applicationScope.async {
-                userDao.loginAccount(username, pin)
-            }.await()
+            val userEntity = userDao.loginAccount(username, pin)
+                ?: return Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
 
-            if (userEntity == null) {
-                return Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
-            }
-
-            applicationScope.launch {
-                settingPreferences.saveLoginSession(
-                    userId = userEntity.userId,
-                    username = userEntity.username,
-                )
-            }.join()
+            settingPreferences.saveLoginSession(
+                userId = userEntity.userId,
+                username = userEntity.username,
+            )
+            joinAll()
 
             return Result.Success(Unit)
 

@@ -67,8 +67,8 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 },
             )
         }
-        composable<Screen.Auth.Register> {
-            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+        composable<Screen.Auth.Register> { entry ->
+            val backStackEntry = remember { entry }
             val viewModel: RegisterViewModel =
                 koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
@@ -96,7 +96,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
         composable<Screen.Auth.Register.CreatePin> {
-            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth.Register) }
             val viewModel: RegisterViewModel =
                 koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
@@ -118,7 +118,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
         composable<Screen.Auth.Register.RepeatPin> {
-            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth.Register) }
             val viewModel: RegisterViewModel =
                 koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
@@ -140,7 +140,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
         composable<Screen.Auth.Register.OnboardingPreferences> {
-            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth) }
+            val backStackEntry = remember { navController.getBackStackEntry(Screen.Auth.Register) }
             val viewModel: RegisterViewModel =
                 koinNavViewModel(viewModelStoreOwner = backStackEntry)
 
