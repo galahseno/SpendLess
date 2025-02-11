@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -112,26 +113,24 @@ private fun RegisterScreen(
                 .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.app_icon),
                 contentDescription = "app_icon"
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = stringResource(R.string.welcome_to_spendless),
-                style = MaterialTheme.typography.headlineMedium
+                text = stringResource(R.string.welcome_to_spendless_how_can_we_address_you),
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center
             )
-            Text(
-                text = stringResource(R.string.how_can_we_address_you),
-                style = MaterialTheme.typography.headlineMedium
-            )
+            Spacer(modifier = Modifier.height(0.5.dp))
             Text(
                 text = stringResource(R.string.create_unique_username),
                 style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             RegisterTextField(
                 text = state.username,
                 onTextChanged = { onAction(RegisterAction.OnUsernameChanged(it)) },
@@ -158,7 +157,7 @@ private fun RegisterScreen(
                     onAction(RegisterAction.OnRegisterNextClick)
                 }
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             TextButton(
                 onClick = {
                     onAction(RegisterAction.OnLoginClick)

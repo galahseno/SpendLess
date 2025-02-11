@@ -127,22 +127,23 @@ private fun LoginScreen(
                 .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.app_icon),
                 contentDescription = "app_icon"
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.welcome_back),
                 style = MaterialTheme.typography.headlineMedium
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = stringResource(R.string.enter_login_detail),
                 style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             LoginTextField(
                 text = state.username,
                 onTextChanged = {
@@ -185,7 +186,6 @@ private fun LoginScreen(
                     }
                 )
             )
-            Spacer(modifier = Modifier.height(4.dp))
             SpendLessButton(
                 enable = state.canLogin,
                 modifier = Modifier.fillMaxWidth(),
@@ -208,6 +208,7 @@ private fun LoginScreen(
             }
         }
 
+        // TODO refactor to composable
         AnimatedVisibility(
             visible = state.isErrorVisible,
             label = "anime_error_container",

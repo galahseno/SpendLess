@@ -41,9 +41,6 @@ sealed class Screen {
             @Serializable
             data object Export
         }
-
-        @Serializable
-        data object AddTransaction
     }
 
     @Serializable

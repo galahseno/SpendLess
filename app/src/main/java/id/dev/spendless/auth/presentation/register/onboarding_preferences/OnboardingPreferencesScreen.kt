@@ -1,5 +1,6 @@
 package id.dev.spendless.auth.presentation.register.onboarding_preferences
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -117,6 +119,13 @@ private fun OnboardingPreferencesScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(screenBackground)
+            .then(
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                    Modifier.systemBarsPadding()
+                } else {
+                    Modifier
+                }
+            )
     ) {
         Column(
             modifier = Modifier
@@ -125,13 +134,14 @@ private fun OnboardingPreferencesScreen(
                 .padding(top = topPaddingAuthScreen)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(80.dp))
             Text(
                 text = stringResource(R.string.set_spendless_preferences),
                 style = MaterialTheme.typography.headlineMedium
             )
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = stringResource(R.string.you_can_change_anytime_in_setting),
                 style = MaterialTheme.typography.titleMedium
@@ -139,9 +149,9 @@ private fun OnboardingPreferencesScreen(
             Spacer(modifier = Modifier.height(14.dp))
             TotalSpendCard(
                 totalSpend = state.formattedTotalSpend,
-                modifier = Modifier.height(110.dp)
+                modifier = Modifier.height(106.dp)
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.expenses_format),
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -149,12 +159,15 @@ private fun OnboardingPreferencesScreen(
                     fontSize = 14.sp
                 )
             )
+            Spacer(modifier = Modifier.height(0.5.dp))
             ExpensesFormat(
                 selectedExpenseFormat = state.selectedExpenseFormat,
+                currency = state.selectedCurrency.symbol,
                 onExpensesSelected = {
                     onAction(RegisterAction.OnExpensesFormatSelected(it))
                 }
             )
+            Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = stringResource(R.string.currency_format),
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -169,6 +182,7 @@ private fun OnboardingPreferencesScreen(
                     onAction(RegisterAction.OnCurrencySelected(it))
                 }
             )
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.desimal_separator),
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -182,6 +196,7 @@ private fun OnboardingPreferencesScreen(
                     onAction(RegisterAction.OnDecimalSeparatorSelected(it))
                 }
             )
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.thousand_separator),
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -195,7 +210,7 @@ private fun OnboardingPreferencesScreen(
                     onAction(RegisterAction.OnThousandSeparatorSelected(it))
                 }
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             SpendLessButton(
                 modifier = Modifier.fillMaxWidth(),
                 enable = state.canProsesRegister,
@@ -208,7 +223,7 @@ private fun OnboardingPreferencesScreen(
 
         TopAppBar(
             modifier = Modifier
-                .padding(10.dp),
+                .padding(start = 10.dp, top = 35.dp),
             title = {},
             navigationIcon = {
                 Icon(

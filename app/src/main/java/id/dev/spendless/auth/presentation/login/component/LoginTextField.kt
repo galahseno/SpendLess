@@ -35,6 +35,7 @@ fun LoginTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
     keyboardActions: KeyboardActions = KeyboardActions(),
 ) {
+    // TODO refactor to basic text field
     TextField(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),

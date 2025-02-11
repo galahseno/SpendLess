@@ -27,7 +27,7 @@ fun EmptyTransaction(
     ) {
         Text(
             text = "\uD83D\uDCB8",
-            fontSize = 114.sp
+            fontSize = 96.sp
         )
         Text(
             text = stringResource(R.string.no_transactions),

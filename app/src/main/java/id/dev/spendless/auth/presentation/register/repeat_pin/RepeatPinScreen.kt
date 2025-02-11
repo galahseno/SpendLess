@@ -131,7 +131,7 @@ private fun RepeatPinScreen(
                 imageVector = ImageVector.vectorResource(R.drawable.app_icon),
                 contentDescription = "app_icon"
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.repeat_pin),
                 style = MaterialTheme.typography.headlineMedium
@@ -164,7 +164,7 @@ private fun RepeatPinScreen(
 
         TopAppBar(
             modifier = Modifier
-                .padding(10.dp),
+                .padding(start = 10.dp, top = 35.dp),
             title = {},
             navigationIcon = {
                 Icon(

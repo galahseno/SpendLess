@@ -36,7 +36,7 @@ fun TotalSpendCard(
             containerColor = componentBackground,
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 2.dp
         )
     ) {
         Column(

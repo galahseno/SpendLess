@@ -37,8 +37,9 @@ fun RegisterTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
     keyboardActions: KeyboardActions = KeyboardActions(),
 ) {
+    // TODO refactor to basic text field
     TextField(
-        modifier = modifier.height(95.dp),
+        modifier = modifier.height(85.dp),
         shape = RoundedCornerShape(16.dp),
         value = text,
         onValueChange = onTextChanged,
