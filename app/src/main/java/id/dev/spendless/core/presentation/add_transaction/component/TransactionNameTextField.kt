@@ -1,15 +1,14 @@
-package id.dev.spendless.auth.presentation.register.component
+package id.dev.spendless.core.presentation.add_transaction.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,24 +21,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import id.dev.spendless.R
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.errorBackground
-import id.dev.spendless.core.presentation.design_system.registerTextFieldBackground
-import java.util.Locale
+import id.dev.spendless.core.presentation.design_system.screenBackground
+import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
 
 @Composable
-fun RegisterTextField(
+fun TransactionNameTextField(
     text: String,
     onTextChanged: (String) -> Unit,
-    hint: String,
+    hintTransactionType: TransactionTypeEnum,
     modifier: Modifier = Modifier,
     supportingText: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
@@ -48,8 +49,8 @@ fun RegisterTextField(
     var isFocused by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BasicTextField(
@@ -59,24 +60,30 @@ fun RegisterTextField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             modifier = Modifier
-                .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
-                .defaultMinSize(minHeight = 64.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(registerTextFieldBackground),
-            textStyle = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
+                .defaultMinSize(minHeight = 24.dp, minWidth = 64.dp)
+                .background(Color.Transparent),
+            textStyle = MaterialTheme.typography.titleLarge.copy(
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp
+            ),
             cursorBrush = SolidColor(buttonBackground),
             decorationBox = { innerBox ->
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     if (text.isEmpty() && !isFocused) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = hint.lowercase(Locale.ROOT),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            text = when(hintTransactionType) {
+                                TransactionTypeEnum.Expenses -> stringResource(R.string.receiver)
+                                TransactionTypeEnum.Income -> stringResource(R.string.sender)
+                            },
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = 16.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -99,19 +106,19 @@ fun RegisterTextField(
 
 @Preview(showBackground = true)
 @Composable
-private fun RegisterTextFieldPreview() {
+private fun TransactionNameTextFieldPreview() {
     SpendLessTheme {
         Box(
             modifier = Modifier
-                .width(325.dp)
-                .height(70.dp)
-                .background(buttonBackground),
+                .width(100.dp)
+                .height(30.dp)
+                .background(screenBackground),
             contentAlignment = Alignment.Center
         ) {
-            RegisterTextField(
+            TransactionNameTextField(
                 text = "",
                 onTextChanged = {},
-                hint = "Username",
+                hintTransactionType = TransactionTypeEnum.Expenses,
                 supportingText = "Username must be unique"
             )
         }

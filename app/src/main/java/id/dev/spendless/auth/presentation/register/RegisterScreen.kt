@@ -1,11 +1,6 @@
 package id.dev.spendless.auth.presentation.register
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -32,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -40,7 +33,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.dev.spendless.R
@@ -48,7 +40,7 @@ import id.dev.spendless.auth.presentation.register.component.RegisterTextField
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.component.SpendLessButton
-import id.dev.spendless.core.presentation.design_system.errorBackground
+import id.dev.spendless.core.presentation.design_system.component.SpendLessErrorContainer
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.screenBackground
@@ -130,15 +122,17 @@ private fun RegisterScreen(
                 text = stringResource(R.string.create_unique_username),
                 style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(26.dp))
             RegisterTextField(
                 text = state.username,
                 onTextChanged = { onAction(RegisterAction.OnUsernameChanged(it)) },
                 hint = stringResource(R.string.username_hint),
                 modifier = Modifier.fillMaxWidth(),
-                supportingText = if (state.usernameSupportText != null) state.usernameSupportText.asString()
+                supportingText = if (state.usernameSupportText != null)
+                    state.usernameSupportText.asString()
                 else null,
             )
+            Spacer(modifier = Modifier.height(4.dp))
             SpendLessButton(
                 enable = state.canRegister,
                 modifier = Modifier
@@ -171,34 +165,15 @@ private fun RegisterScreen(
             }
         }
 
-        AnimatedVisibility(
-            visible = state.isErrorVisible,
-            label = "anime_error_container",
+        SpendLessErrorContainer(
+            isErrorVisible = state.isErrorVisible,
+            errorHeightDp = errorHeightDp,
+            errorMessage = state.errorMessage?.asString() ?: "",
+            keyboardOpen = keyboardOpen,
             modifier = Modifier
                 .padding(bottom = keyboardHeight)
-                .align(Alignment.BottomCenter),
-            enter = slideIn(initialOffset = { IntOffset(0, it.height / 2) }) + fadeIn(),
-            exit = slideOut(targetOffset = { IntOffset(0, it.height / 2) }) + fadeOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(errorHeightDp)
-                    .background(errorBackground),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = state.errorMessage?.asString() ?: "",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500),
-                    modifier = Modifier
-                        .then(
-                            if (keyboardOpen) Modifier
-                            else Modifier.navigationBarsPadding()
-                        )
-                )
-            }
-        }
+                .align(Alignment.BottomCenter)
+        )
     }
 }
 

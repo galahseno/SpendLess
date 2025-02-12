@@ -2,12 +2,14 @@ package id.dev.spendless.main.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import id.dev.spendless.auth.presentation.login.LoginScreenRoot
 import id.dev.spendless.auth.presentation.register.RegisterScreenRoot
@@ -66,10 +68,13 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 },
             )
         }
-        composable<Screen.Auth.Register> { entry ->
-            val backStackEntry = remember { entry }
+        composable<Screen.Auth.Register> {
+            // TODO only navigate when user already displayed to prevent bug when navigating to fast
+            // java.lang.IllegalStateException:  You cannot access the NavBackStackEntry's ViewModels after the NavBackStackEntry is destroyed
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val backStackEntry = remember { it }
             val viewModel: RegisterViewModel =
-                koinNavViewModel(viewModelStoreOwner = backStackEntry)
+                koinNavViewModel(viewModelStoreOwner = navBackStackEntry ?: backStackEntry)
 
             RegisterScreenRoot(
                 onNavigateToLogin = {

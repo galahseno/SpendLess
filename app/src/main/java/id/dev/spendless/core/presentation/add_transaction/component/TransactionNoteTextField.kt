@@ -1,18 +1,20 @@
-package id.dev.spendless.auth.presentation.register.component
+package id.dev.spendless.core.presentation.add_transaction.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,24 +24,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import id.dev.spendless.R
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.errorBackground
-import id.dev.spendless.core.presentation.design_system.registerTextFieldBackground
-import java.util.Locale
+import id.dev.spendless.core.presentation.design_system.screenBackground
 
 @Composable
-fun RegisterTextField(
+fun TransactionNoteTextField(
     text: String,
     onTextChanged: (String) -> Unit,
-    hint: String,
     modifier: Modifier = Modifier,
     supportingText: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
@@ -48,37 +51,57 @@ fun RegisterTextField(
     var isFocused by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BasicTextField(
             value = text,
-            onValueChange = onTextChanged,
-            singleLine = true,
+            onValueChange = { newText ->
+                val lines = newText.lines()
+                if (lines.size <= 3) {
+                    onTextChanged(newText)
+                } else {
+                   onTextChanged(lines.take(3).joinToString("\n"))
+                }
+            },
+            maxLines = 3,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             modifier = Modifier
-                .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
-                .defaultMinSize(minHeight = 64.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(registerTextFieldBackground),
-            textStyle = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
+                .background(Color.Transparent),
+            textStyle = MaterialTheme.typography.titleMedium.copy(
+                textAlign = TextAlign.Center,
+            ),
             cursorBrush = SolidColor(buttonBackground),
             decorationBox = { innerBox ->
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier,
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     if (text.isEmpty() && !isFocused) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = hint.lowercase(Locale.ROOT),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                            textAlign = TextAlign.Center
-                        )
+                        Row(
+                            modifier = Modifier.defaultMinSize(
+                                minWidth = 100.dp,
+                                minHeight = 24.dp
+                            ),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Add,
+                                contentDescription = "",
+                                modifier = Modifier.alpha(0.6f)
+                            )
+                            Text(
+                                text = stringResource(R.string.add_note),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+
                     }
                     innerBox()
                 }
@@ -99,19 +122,18 @@ fun RegisterTextField(
 
 @Preview(showBackground = true)
 @Composable
-private fun RegisterTextFieldPreview() {
+private fun TransactionNameTextFieldPreview() {
     SpendLessTheme {
         Box(
             modifier = Modifier
-                .width(325.dp)
-                .height(70.dp)
-                .background(buttonBackground),
+                .width(175.dp)
+                .height(50.dp)
+                .background(screenBackground),
             contentAlignment = Alignment.Center
         ) {
-            RegisterTextField(
+            TransactionNoteTextField(
                 text = "",
                 onTextChanged = {},
-                hint = "Username",
                 supportingText = "Username must be unique"
             )
         }

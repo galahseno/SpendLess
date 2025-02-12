@@ -1,11 +1,6 @@
 package id.dev.spendless.auth.presentation.login
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -35,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -45,7 +38,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,7 +46,7 @@ import id.dev.spendless.auth.presentation.login.component.LoginTextField
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.component.SpendLessButton
-import id.dev.spendless.core.presentation.design_system.errorBackground
+import id.dev.spendless.core.presentation.design_system.component.SpendLessErrorContainer
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.screenBackground
@@ -73,7 +65,7 @@ fun LoginScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.event) { event ->
-        when(event) {
+        when (event) {
             is LoginEvent.OnLoginSuccess -> onSuccessLogin()
         }
     }
@@ -143,7 +135,7 @@ private fun LoginScreen(
                 text = stringResource(R.string.enter_login_detail),
                 style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             LoginTextField(
                 text = state.username,
                 onTextChanged = {
@@ -162,6 +154,7 @@ private fun LoginScreen(
                     }
                 )
             )
+            Spacer(modifier = Modifier.height(10.dp))
             LoginTextField(
                 text = state.pin,
                 onTextChanged = {
@@ -181,11 +174,14 @@ private fun LoginScreen(
                 ),
                 keyboardActions = KeyboardActions(
                     onGo = {
-                        keyboardController?.hide()
-                        onAction(LoginAction.OnLoginClick)
+                        if (state.canLogin) {
+                            keyboardController?.hide()
+                            onAction(LoginAction.OnLoginClick)
+                        }
                     }
                 )
             )
+            Spacer(modifier = Modifier.height(14.dp))
             SpendLessButton(
                 enable = state.canLogin,
                 modifier = Modifier.fillMaxWidth(),
@@ -194,7 +190,7 @@ private fun LoginScreen(
                     onAction(LoginAction.OnLoginClick)
                 }
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             TextButton(
                 onClick = {
                     onAction(LoginAction.OnRegisterClick)
@@ -208,35 +204,15 @@ private fun LoginScreen(
             }
         }
 
-        // TODO refactor to composable
-        AnimatedVisibility(
-            visible = state.isErrorVisible,
-            label = "anime_error_container",
+        SpendLessErrorContainer(
+            isErrorVisible = state.isErrorVisible,
+            errorHeightDp = errorHeightDp,
+            errorMessage = state.errorMessage?.asString() ?: "",
+            keyboardOpen = keyboardOpen,
             modifier = Modifier
                 .padding(bottom = keyboardHeight)
-                .align(Alignment.BottomCenter),
-            enter = slideIn(initialOffset = { IntOffset(0, it.height / 2) }) + fadeIn(),
-            exit = slideOut(targetOffset = { IntOffset(0, it.height / 2) }) + fadeOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(errorHeightDp)
-                    .background(errorBackground),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = state.errorMessage?.asString() ?: "",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500),
-                    modifier = Modifier
-                        .then(
-                            if (keyboardOpen) Modifier
-                            else Modifier.navigationBarsPadding()
-                        )
-                )
-            }
-        }
+                .align(Alignment.BottomCenter)
+        )
     }
 }
 

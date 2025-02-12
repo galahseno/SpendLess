@@ -1,12 +1,7 @@
 package id.dev.spendless.auth.presentation.register.repeat_pin
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -39,9 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.dev.spendless.R
@@ -50,9 +42,9 @@ import id.dev.spendless.auth.presentation.register.RegisterEvent
 import id.dev.spendless.auth.presentation.register.RegisterState
 import id.dev.spendless.auth.presentation.register.RegisterViewModel
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
+import id.dev.spendless.core.presentation.design_system.component.SpendLessErrorContainer
 import id.dev.spendless.core.presentation.design_system.component.pin.KeyPad
 import id.dev.spendless.core.presentation.design_system.component.pin.PinDotView
-import id.dev.spendless.core.presentation.design_system.errorBackground
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.screenBackground
@@ -180,34 +172,15 @@ private fun RepeatPinScreen(
             )
         )
 
-        AnimatedVisibility(
-            visible = state.isErrorVisible,
-            label = "anime_error_container",
+        SpendLessErrorContainer(
+            isErrorVisible = state.isErrorVisible,
+            errorHeightDp = errorHeightDp,
+            errorMessage = state.errorMessage?.asString() ?: "",
+            keyboardOpen = keyboardOpen,
             modifier = Modifier
                 .padding(bottom = keyboardHeight)
-                .align(Alignment.BottomCenter),
-            enter = slideIn(initialOffset = { IntOffset(0, it.height / 2) }) + fadeIn(),
-            exit = slideOut(targetOffset = { IntOffset(0, it.height / 2) }) + fadeOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(errorHeightDp)
-                    .background(errorBackground),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = state.errorMessage?.asString() ?: "",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500),
-                    modifier = Modifier
-                        .then(
-                            if (keyboardOpen) Modifier
-                            else Modifier.navigationBarsPadding()
-                        )
-                )
-            }
-        }
+                .align(Alignment.BottomCenter)
+        )
     }
 }
 

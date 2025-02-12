@@ -38,4 +38,10 @@
     <string name="show_all">Show all</string>
     <string name="create_transaction">Create Transaction</string>
     <string name="welcome_to_spendless_how_can_we_address_you">Welcome to SpendLess!\nHow can we address you?</string>
+    <string name="receiver">Receiver</string>
+    <string name="sender">Sender</string>
+    <string name="invalid_transaction">transaction name min 3 character and max 14 character</string>
+    <string name="invalid_transaction_amount">transaction amount max 13 digit</string>
+    <string name="invalid_transaction_note">note max 100 character</string>
+    <string name="add_note">Add Note</string>
 </resources>
