@@ -4,10 +4,17 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
+import id.dev.spendless.core.domain.CoreRepository
+import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.model.AddTransaction
+import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
+import id.dev.spendless.core.presentation.ui.transaction.TransactionCategoryEnum
 import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
+import id.dev.spendless.core.presentation.ui.transaction.repeat_interval.RepeatIntervalEnum
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -16,9 +23,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class AddTransactionViewModel(
-
+    private val coreRepository: CoreRepository,
+    settingPreferences: SettingPreferences
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddTransactionState())
     val state = _state.asStateFlow()
@@ -27,6 +36,13 @@ class AddTransactionViewModel(
     val event = _event.receiveAsFlow()
 
     init {
+        settingPreferences
+            .getUserStatus()
+            .onEach { userId ->
+                if (userId != -1) _state.update { it.copy(userId = userId) }
+            }
+            .launchIn(viewModelScope)
+
         _state
             .map { it.expenseName to it.incomeName }
             .distinctUntilChanged()
@@ -77,6 +93,33 @@ class AddTransactionViewModel(
                 }
             }
             .launchIn(viewModelScope)
+
+        _state
+            .onEach {
+                when (it.selectedTransactionType) {
+                    TransactionTypeEnum.Expenses -> {
+                        _state.update { state ->
+                            state.copy(
+                                canAddTransaction = isValidTransactionName(it.expenseName) &&
+                                        isValidTransactionAmount(it.expenseAmount) &&
+                                        isValidTransactionNote(it.expensesNote) &&
+                                        !it.expenseAmount.matches(Regex("[.,]"))
+                            )
+                        }
+                    }
+
+                    TransactionTypeEnum.Income -> {
+                        _state.update { state ->
+                            state.copy(
+                                canAddTransaction = isValidTransactionName(it.incomeName) &&
+                                        isValidTransactionAmount(it.incomeAmount) &&
+                                        isValidTransactionNote(it.incomeNote) &&
+                                        !it.incomeAmount.matches(Regex("[.,]"))
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: AddTransactionAction) {
@@ -92,6 +135,14 @@ class AddTransactionViewModel(
 
             is AddTransactionAction.OnExpenseOrIncomeNoteChanged ->
                 handleExpenseOrIncomeNoteChanged(action.transactionType, action.value)
+
+            is AddTransactionAction.OnExpenseCategorySelected ->
+                handleExpenseCategorySelected(action.expenseCategory)
+
+            is AddTransactionAction.OnRepeatIntervalSelected ->
+                handleRepeatIntervalSelected(action.transactionType, action.repeatInterval)
+
+            is AddTransactionAction.OnAddTransaction -> handleAddTransaction()
 
             else -> {}
         }
@@ -156,6 +207,69 @@ class AddTransactionViewModel(
         }
     }
 
+    private fun handleExpenseCategorySelected(
+        expenseCategory: TransactionCategoryEnum
+    ) {
+        _state.update { it.copy(selectedExpenseCategory = expenseCategory) }
+    }
+
+    private fun handleRepeatIntervalSelected(
+        transactionType: TransactionTypeEnum,
+        repeatInterval: RepeatIntervalEnum
+    ) {
+        when (transactionType) {
+            TransactionTypeEnum.Expenses -> _state.update { it.copy(selectedExpenseRepeatInterval = repeatInterval) }
+            TransactionTypeEnum.Income -> _state.update { it.copy(selectedIncomeRepeatInterval = repeatInterval) }
+        }
+    }
+
+    private fun handleAddTransaction() {
+        viewModelScope.launch {
+            val transactionData = when (_state.value.selectedTransactionType) {
+                TransactionTypeEnum.Expenses -> AddTransaction(
+                    userId = _state.value.userId,
+                    transactionName = _state.value.expenseName,
+                    categoryEmoji = _state.value.selectedExpenseCategory.categoryEmoji,
+                    categoryName = _state.value.selectedExpenseCategory.categoryName,
+                    amount = _state.value.expenseAmount.toDouble(),
+                    note = _state.value.expensesNote,
+                    createdAt = System.currentTimeMillis(),
+                    repeat = _state.value.selectedExpenseRepeatInterval.repeatName
+                )
+
+                TransactionTypeEnum.Income -> AddTransaction(
+                    userId = _state.value.userId,
+                    transactionName = _state.value.incomeName,
+                    categoryEmoji = TransactionCategoryEnum.Income.categoryEmoji,
+                    categoryName = TransactionCategoryEnum.Income.categoryName,
+                    amount = _state.value.incomeAmount.toDouble(),
+                    note = _state.value.incomeNote,
+                    createdAt = System.currentTimeMillis(),
+                    repeat = _state.value.selectedIncomeRepeatInterval.repeatName
+                )
+            }
+            val result = coreRepository.createTransaction(transactionData)
+
+            when (result) {
+                is Result.Error -> {
+                    if (!_state.value.isErrorVisible) {
+                        _state.update {
+                            it.copy(
+                                isErrorVisible = true,
+                                errorMessage = UiText.StringResource(R.string.error_proses),
+                            )
+                        }
+                        dismissError()
+                    }
+                }
+
+                is Result.Success -> {
+                    _event.send(AddTransactionEvent.OnAddTransactionSuccess)
+                }
+            }
+        }
+    }
+
     // TODO Trim traling when save transaction
     private fun trimTrailingExtraSpaces(input: String): String {
         if (input.isBlank()) {
@@ -180,10 +294,17 @@ class AddTransactionViewModel(
     }
 
     private fun isValidTransactionAmount(amount: String): Boolean {
-        return amount.length <= 13
+        return amount.length in 1..13
     }
 
     private fun isValidTransactionNote(note: String): Boolean {
         return note.length <= 100
+    }
+
+    private fun dismissError() {
+        viewModelScope.launch {
+            delay(2000)
+            _state.update { it.copy(isErrorVisible = false) }
+        }
     }
 }

@@ -41,7 +41,6 @@ val coreDataModule = module {
             //.openHelperFactory(supportFactory)
             .build()
     }
-    single { get<SpendLessDb>().categoryDao() }
     single { get<SpendLessDb>().transactionDao() }
     single { get<SpendLessDb>().userDao() }
 }

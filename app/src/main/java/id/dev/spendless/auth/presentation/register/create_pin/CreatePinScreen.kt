@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,8 +25,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,7 +48,7 @@ import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.design_system.topPaddingAuthScreen
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
-import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
+import id.dev.spendless.core.presentation.ui.keyboardOpenAsState
 
 @Composable
 fun CreatePinScreenRoot(
@@ -86,10 +85,7 @@ private fun CreatePinScreen(
     state: RegisterState,
     onAction: (RegisterAction) -> Unit
 ) {
-    val keyboardHeight by keyboardHeightAsState()
-    val keyboardOpen by remember(keyboardHeight) {
-        mutableStateOf(keyboardHeight > 0.dp)
-    }
+    val keyboardOpen by keyboardOpenAsState()
     val errorHeightDp by animateDpAsState(
         if (keyboardOpen) errorHeightOpenKeyboard else errorHeightClosedKeyboard,
         label = "anim_error_height"
@@ -169,7 +165,7 @@ private fun CreatePinScreen(
             errorMessage = state.errorMessage?.asString() ?: "",
             keyboardOpen = keyboardOpen,
             modifier = Modifier
-                .padding(bottom = keyboardHeight)
+                .imePadding()
                 .align(Alignment.BottomCenter)
         )
     }

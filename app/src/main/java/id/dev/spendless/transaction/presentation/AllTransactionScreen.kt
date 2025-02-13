@@ -1,4 +1,4 @@
-package id.dev.spendless.transaction.presentation.all_transaction
+package id.dev.spendless.transaction.presentation
 
 import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
@@ -53,7 +53,6 @@ fun AllTransactionScreenRoot(
         onAction = { action ->
             when (action) {
                 is AllTransactionAction.OnBackClick -> onBackClick()
-                else -> {}
             }
             viewModel.onAction(action)
         }
@@ -113,15 +112,6 @@ private fun AllTransactionScreen(
             ) {
                 AddTransactionScreenRoot(
                     sheetState = sheetState,
-                    onCloseModalSheet = {
-                        scope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet = false
-                            }
-                        }
-                    },
                     onDismissRequest = {
                         scope.launch {
                             sheetState.hide()

@@ -18,6 +18,7 @@ val incomeBackground = Color(0xFF29AC08)
 val registerTextFieldBackground = Color(0xFFEBE5EE)
 val keyPadBackground = Color(0xFFEADDFF)
 val secondaryColor = Color(0xFFE5EA58)
+val repeatIntervalBackgroundColor = Color(0xFFC4E0F9)
 
 val gradientBackground = Brush.radialGradient(
     colors = listOf(

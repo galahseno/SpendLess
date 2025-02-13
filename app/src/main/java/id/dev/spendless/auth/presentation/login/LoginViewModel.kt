@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,8 +33,6 @@ class LoginViewModel(
             _state.map { it.username }.distinctUntilChanged(),
             _state.map { it.pin }.distinctUntilChanged()
         ) { username, pin ->
-            Pair(username, pin)
-        }.onEach { (username, pin) ->
             _state.update { state ->
                 state.copy(
                     usernameSupportText =

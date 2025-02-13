@@ -1,4 +1,4 @@
-package id.dev.spendless.transaction.presentation.all_transaction
+package id.dev.spendless.transaction.presentation
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.channels.Channel

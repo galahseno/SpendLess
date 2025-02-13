@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -53,7 +54,7 @@ import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.design_system.topPaddingAuthScreen
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.core.presentation.ui.UiText
-import id.dev.spendless.core.presentation.ui.keyboardHeightAsState
+import id.dev.spendless.core.presentation.ui.keyboardOpenAsState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -91,10 +92,7 @@ private fun LoginScreen(
     val pinFocus = remember { FocusRequester() }
     var firstOpenScreen by rememberSaveable { mutableStateOf(true) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val keyboardHeight by keyboardHeightAsState()
-    val keyboardOpen by remember(keyboardHeight) {
-        mutableStateOf(keyboardHeight > 0.dp)
-    }
+    val keyboardOpen by keyboardOpenAsState()
     val errorHeightDp by animateDpAsState(
         if (keyboardOpen) errorHeightOpenKeyboard else errorHeightClosedKeyboard,
         label = "anim_error_height"
@@ -210,7 +208,7 @@ private fun LoginScreen(
             errorMessage = state.errorMessage?.asString() ?: "",
             keyboardOpen = keyboardOpen,
             modifier = Modifier
-                .padding(bottom = keyboardHeight)
+                .imePadding()
                 .align(Alignment.BottomCenter)
         )
     }

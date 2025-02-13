@@ -5,4 +5,5 @@ import id.dev.spendless.transaction.domain.TransactionRepository
 class TransactionRepositoryImpl(
 
 ): TransactionRepository {
+
 }

@@ -22,8 +22,8 @@ import id.dev.spendless.dashboard.presentation.DashboardScreenRoot
 import id.dev.spendless.settings.presentation.SettingScreenRoot
 import id.dev.spendless.settings.presentation.preferences.PreferencesScreenRoot
 import id.dev.spendless.settings.presentation.security.SecurityScreenRoot
-import id.dev.spendless.transaction.presentation.all_transaction.AllTransactionScreenRoot
-import id.dev.spendless.transaction.presentation.all_transaction.export.ExportScreenRoot
+import id.dev.spendless.transaction.presentation.AllTransactionScreenRoot
+import id.dev.spendless.transaction.presentation.export.ExportScreenRoot
 import org.koin.androidx.compose.navigation.koinNavViewModel
 
 @Composable

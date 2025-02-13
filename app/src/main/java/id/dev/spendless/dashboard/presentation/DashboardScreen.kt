@@ -146,15 +146,6 @@ private fun DashboardScreen(
             ) {
                 AddTransactionScreenRoot(
                     sheetState = sheetState,
-                    onCloseModalSheet = {
-                        scope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet = false
-                            }
-                        }
-                    },
                     onDismissRequest = {
                         scope.launch {
                             sheetState.hide()

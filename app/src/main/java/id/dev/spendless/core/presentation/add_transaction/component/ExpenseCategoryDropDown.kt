@@ -1,4 +1,4 @@
-package id.dev.spendless.core.presentation.design_system.component.preferences
+package id.dev.spendless.core.presentation.add_transaction.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,13 +35,15 @@ import androidx.compose.ui.unit.sp
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.componentBackground
-import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
+import id.dev.spendless.core.presentation.design_system.keyPadBackground
+import id.dev.spendless.core.presentation.ui.transaction.TransactionCategoryEnum
+import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyDropDown(
-    selectedCurrency: CurrencyEnum,
-    onSelectedCurrency: (CurrencyEnum) -> Unit,
+fun ExpenseCategoryDropDown(
+    selectedExpenseCategory: TransactionCategoryEnum,
+    onSelectedExpense: (TransactionCategoryEnum) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -56,7 +57,8 @@ fun CurrencyDropDown(
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
-        )
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -68,22 +70,20 @@ fun CurrencyDropDown(
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxSize()
-                    .padding(end = 10.dp),
+                    .padding(start = 4.dp, end = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = selectedCurrency.symbol,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.W500
-                    ),
+                    text = selectedExpenseCategory.categoryEmoji,
+                    fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .padding(start = 14.dp)
+                        .background(keyPadBackground)
+                        .padding(8.dp)
                 )
                 Text(
-                    text = selectedCurrency.currencyName,
+                    text = selectedExpenseCategory.categoryName,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .weight(1f)
@@ -93,7 +93,7 @@ fun CurrencyDropDown(
             }
 
             MaterialTheme(
-                shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
+                shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp)),
             ) {
                 // TODO change the height and add scroll bar same as project overview
                 DropdownMenu(
@@ -103,31 +103,35 @@ fun CurrencyDropDown(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    CurrencyEnum.entries.forEach { item ->
-                        DropdownMenuItem(
-                            leadingIcon = {
-                                Text(
-                                    text = item.symbol,
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                )
-                            },
-                            text = { Text(text = item.currencyName) },
-                            onClick = {
-                                onSelectedCurrency(item)
-                                expanded = false
-                            },
-                            trailingIcon = {
-                                if (selectedCurrency.symbol == item.symbol) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Check,
-                                        contentDescription = "selected_currency",
-                                        tint = buttonBackground
+                    TransactionCategoryEnum.entries.filter { it.transactionType == TransactionTypeEnum.Expenses }
+                        .forEach { item ->
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    Text(
+                                        text = item.categoryEmoji,
+                                        fontSize = 20.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(keyPadBackground)
                                     )
+                                },
+                                text = { Text(text = item.categoryName) },
+                                onClick = {
+                                    onSelectedExpense(item)
+                                    expanded = false
+                                },
+                                trailingIcon = {
+                                    if (selectedExpenseCategory.categoryName == item.categoryName) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Check,
+                                            contentDescription = "selected_expense",
+                                            tint = buttonBackground
+                                        )
+                                    }
                                 }
-                            }
-                        )
-                    }
+                            )
+                        }
                 }
             }
         }
@@ -136,12 +140,12 @@ fun CurrencyDropDown(
 
 @Preview(showBackground = true)
 @Composable
-private fun CurrencyDropDownPreview() {
+private fun ExpenseCategoryDropDownPreview() {
     SpendLessTheme {
-        CurrencyDropDown(
-            selectedCurrency = CurrencyEnum.IDR,
+        ExpenseCategoryDropDown(
+            selectedExpenseCategory = TransactionCategoryEnum.Other,
             modifier = Modifier.padding(20.dp),
-            onSelectedCurrency = {
+            onSelectedExpense = {
 
             }
         )

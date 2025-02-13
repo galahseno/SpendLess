@@ -60,7 +60,6 @@ class AuthRepositoryImpl(
             coroutineContext.ensureActive()
             return Result.Error(DataError.Local.ERROR_PROSES)
         }
-
     }
 
     override suspend fun loginAccount(
@@ -78,7 +77,7 @@ class AuthRepositoryImpl(
                 ?: return Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
 
             settingPreferences.saveLoginSession(
-                userId = userEntity.userId,
+                userId = userEntity.id,
                 username = userEntity.username,
             )
             joinAll()
