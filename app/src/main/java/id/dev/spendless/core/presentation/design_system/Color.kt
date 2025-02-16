@@ -17,6 +17,8 @@ val errorBackground = Color(0xFFA40019)
 val incomeBackground = Color(0xFF29AC08)
 val registerTextFieldBackground = Color(0xFFEBE5EE)
 val keyPadBackground = Color(0xFFEADDFF)
+val settingIconsBackground = Color(0XFFF6F3F3)
+val logOutColor = Color(0XFFA40019)
 val secondaryColor = Color(0xFFE5EA58)
 val repeatIntervalBackgroundColor = Color(0xFFC4E0F9)
 
