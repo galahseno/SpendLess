@@ -1,6 +1,7 @@
 package id.dev.spendless.settings.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +43,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingScreenRoot(
-
+    onPreferencesClick: () -> Unit,
+    onSecurityClick: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -53,7 +55,15 @@ fun SettingScreenRoot(
 
     SettingScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when (action) {
+                is SettingsAction.OnPreferencesClick -> onPreferencesClick()
+                is SettingsAction.OnSecurityClick -> onSecurityClick()
+
+                else -> {}
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
@@ -62,7 +72,6 @@ private fun SettingScreen(
     state: SettingsState,
     onAction: (SettingsAction) -> Unit
 ) {
-
     Scaffold(
         topBar = { SettingAppBar() }
     ) { innerPadding ->
@@ -76,15 +85,9 @@ private fun SettingScreen(
         ) {
 
             Card(
-                shape = RoundedCornerShape(
-                    15.dp
-                ),
-                elevation = CardDefaults.cardElevation(
-                    5.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
+                shape = RoundedCornerShape(15.dp),
+                elevation = CardDefaults.cardElevation(5.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = Modifier
                     .height(120.dp)
                     .padding(10.dp)
@@ -94,6 +97,9 @@ private fun SettingScreen(
                     modifier = Modifier
                         .weight(0.5f)
                         .fillMaxWidth()
+                        .clickable {
+                            onAction(SettingsAction.OnPreferencesClick)
+                        }
                 ) {
 
                     Box(
@@ -121,6 +127,9 @@ private fun SettingScreen(
                     modifier = Modifier
                         .weight(0.5f)
                         .fillMaxWidth()
+                        .clickable {
+                            onAction(SettingsAction.OnSecurityClick)
+                        }
                 ) {
 
                     Box(
@@ -144,15 +153,9 @@ private fun SettingScreen(
             }
 
             Card(
-                shape = RoundedCornerShape(
-                    15.dp
-                ),
-                elevation = CardDefaults.cardElevation(
-                    5.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
+                shape = RoundedCornerShape(15.dp),
+                elevation = CardDefaults.cardElevation(5.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = Modifier
                     .height(50.dp)
                     .padding(horizontal = 10.dp)
@@ -181,23 +184,15 @@ private fun SettingScreen(
                         color = logOutColor,
                         fontFamily = FontFamily(Font(R.font.figtree_medium))
                     )
-
-
                 }
-
             }
-
         }
-
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingAppBar() {
-
     TopAppBar(
         title = {
             Text(
@@ -216,9 +211,7 @@ private fun SettingAppBar() {
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = screenBackground
         ),
-
-        )
-
+    )
 }
 
 @Preview(showBackground = true)

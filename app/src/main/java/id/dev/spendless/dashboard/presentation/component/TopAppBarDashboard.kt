@@ -34,6 +34,7 @@ import id.dev.spendless.core.presentation.design_system.gradientBackground
 @Composable
 fun TopAppBarDashboard(
     username: String,
+    onSettingClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -80,7 +81,11 @@ fun TopAppBarDashboard(
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "export",
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier
+                        .clickable {
+                            onSettingClick()
+                        }
                 )
             }
         }
@@ -96,6 +101,9 @@ private fun TopAppBarDashboardPreview() {
         ) {
             TopAppBarDashboard(
                 username = "rockefeller74",
+                onSettingClick = {
+
+                }
             )
         }
     }

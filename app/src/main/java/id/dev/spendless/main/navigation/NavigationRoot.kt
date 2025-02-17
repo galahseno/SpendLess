@@ -176,6 +176,9 @@ private fun NavGraphBuilder.homeGraph(navController: NavHostController) {
                 onNavigateToAllTransaction = {
                     navController.navigate(Screen.Transaction.AllTransaction)
                 },
+                onNavigateToSettingScreen = {
+                    navController.navigate(Screen.Settings)
+                }
             )
         }
     }
@@ -218,7 +221,12 @@ private fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
     ) {
         composable<Screen.Settings.SettingsMenu> {
             SettingScreenRoot(
-
+                onPreferencesClick = {
+                    navController.navigate(Screen.Settings.SettingsMenu.Preferences)
+                },
+                onSecurityClick = {
+                    navController.navigate(Screen.Settings.SettingsMenu.Security)
+                }
             )
         }
         composable<Screen.Settings.SettingsMenu.Preferences> {

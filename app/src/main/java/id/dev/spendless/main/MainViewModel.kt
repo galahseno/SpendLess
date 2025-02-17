@@ -18,7 +18,7 @@ class MainViewModel(
     init {
         state = state.copy(isCheckingAuth = true)
         settingPreferences
-            .getUserStatus()
+            .getUserId()
             .onEach { userId ->
                 state = state.copy(
                     isCheckingAuth = false, isLoggedIn = userId != -1

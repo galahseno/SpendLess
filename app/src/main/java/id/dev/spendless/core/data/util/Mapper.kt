@@ -1,9 +1,9 @@
 package id.dev.spendless.core.data.util
 
 import id.dev.spendless.core.data.database.entity.TransactionEntity
-import id.dev.spendless.core.domain.model.AddTransaction
+import id.dev.spendless.core.domain.model.TransactionModel
 
-fun AddTransaction.toTransactionEntity(): TransactionEntity {
+fun TransactionModel.toTransactionEntity(userId: Int): TransactionEntity {
     return TransactionEntity(
         userId = userId,
         transactionName = transactionName,

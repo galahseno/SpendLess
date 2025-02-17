@@ -9,7 +9,6 @@ import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
 import id.dev.spendless.core.presentation.ui.transaction.repeat_interval.RepeatIntervalEnum
 
 data class AddTransactionState(
-    val userId: Int = -1,
     val expenseName: String = "",
     val expenseNameSupportText: UiText? = null,
     val expenseAmount: String = "",

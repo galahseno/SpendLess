@@ -1,7 +1,6 @@
 package id.dev.spendless.core.domain.model
 
-data class AddTransaction(
-    val userId: Int,
+data class TransactionModel(
     val transactionName: String,
     val categoryEmoji: String,
     val categoryName: String,

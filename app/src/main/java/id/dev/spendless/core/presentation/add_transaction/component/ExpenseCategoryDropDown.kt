@@ -1,12 +1,15 @@
 package id.dev.spendless.core.presentation.add_transaction.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
@@ -28,14 +31,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.componentBackground
 import id.dev.spendless.core.presentation.design_system.keyPadBackground
+import id.dev.spendless.core.presentation.ui.crop
 import id.dev.spendless.core.presentation.ui.transaction.TransactionCategoryEnum
 import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
 
@@ -95,43 +101,58 @@ fun ExpenseCategoryDropDown(
             MaterialTheme(
                 shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp)),
             ) {
-                // TODO change the height and add scroll bar same as project overview
-                DropdownMenu(
+                // TODO add scroll bar same as project overview
+                BoxWithConstraints(
                     modifier = Modifier
-                        .size(width = 380.dp, height = 240.dp)
-                        .background(componentBackground),
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                        .fillMaxWidth(),
                 ) {
-                    TransactionCategoryEnum.entries.filter { it.transactionType == TransactionTypeEnum.Expenses }
-                        .forEach { item ->
-                            DropdownMenuItem(
-                                leadingIcon = {
-                                    Text(
-                                        text = item.categoryEmoji,
-                                        fontSize = 20.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(keyPadBackground)
-                                    )
-                                },
-                                text = { Text(text = item.categoryName) },
-                                onClick = {
-                                    onSelectedExpense(item)
-                                    expanded = false
-                                },
-                                trailingIcon = {
-                                    if (selectedExpenseCategory.categoryName == item.categoryName) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Check,
-                                            contentDescription = "selected_expense",
-                                            tint = buttonBackground
+                    DropdownMenu(
+                        modifier = Modifier
+                            .width(with(LocalDensity.current) { maxWidth })
+                            .sizeIn(maxHeight = 255.dp)
+                            .background(componentBackground)
+                            .crop(vertical = 8.dp),
+                        expanded = expanded,
+                        offset = DpOffset(x = 0.dp, y = maxHeight + 6.dp),
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        TransactionCategoryEnum.entries.filter { it.transactionType == TransactionTypeEnum.Expenses }
+                            .sortedBy { it.categoryName }.forEach { item ->
+                                DropdownMenuItem(
+                                    contentPadding = PaddingValues(horizontal = 4.dp),
+                                    leadingIcon = {
+                                        Text(
+                                            text = item.categoryEmoji,
+                                            fontSize = 20.sp,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(keyPadBackground)
+                                                .padding(8.dp)
                                         )
+                                    },
+                                    text = {
+                                        Text(
+                                            text = item.categoryName,
+                                            style = MaterialTheme.typography.titleMedium,
+                                        )
+                                    },
+                                    onClick = {
+                                        onSelectedExpense(item)
+                                        expanded = false
+                                    },
+                                    trailingIcon = {
+                                        if (selectedExpenseCategory.categoryName == item.categoryName) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = "selected_expense",
+                                                tint = buttonBackground
+                                            )
+                                        }
                                     }
-                                }
-                            )
-                        }
+                                )
+                            }
+                    }
                 }
             }
         }

@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,11 +21,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.R
+import id.dev.spendless.core.domain.model.CategoryWithEmoji
+import id.dev.spendless.core.domain.model.LargestTransaction
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
+import id.dev.spendless.core.presentation.design_system.componentBackground
 import id.dev.spendless.core.presentation.design_system.gradientBackground
 import id.dev.spendless.core.presentation.design_system.keyPadBackground
 import id.dev.spendless.core.presentation.design_system.secondaryColor
@@ -37,24 +43,32 @@ import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 fun DashboardSummary(
     balance: String,
     previousWeekSpend: String,
-    modifier: Modifier = Modifier
+    largestTransactionAllTime: CategoryWithEmoji?,
+    largestTransaction: LargestTransaction?,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .padding(horizontal = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column(
             modifier = Modifier
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(6.dp, alignment = Alignment.CenterVertically),
+                .weight(0.9f),
+            verticalArrangement = Arrangement.spacedBy(
+                2.dp,
+                alignment = Alignment.CenterVertically
+            ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(52.dp))
+            // TODO check spacing when no largest transactionCategory
+            Spacer(modifier = Modifier.height(48.dp))
             Text(
                 text = balance,
-                style = MaterialTheme.typography.headlineLarge.copy(color = Color.White)
+                style = MaterialTheme.typography.headlineLarge.copy(color = Color.White),
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = stringResource(R.string.account_balance),
@@ -64,28 +78,85 @@ fun DashboardSummary(
                 )
             )
         }
+        if (largestTransactionAllTime?.categoryName != null && largestTransactionAllTime.categoryEmoji != null) {
+            LargestTransactionCategoryAllTime(
+                categoryName = largestTransactionAllTime.categoryName,
+                categoryEmoji = largestTransactionAllTime.categoryEmoji,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 72.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(componentBackground.copy(0.2f))
+                    .padding(8.dp)
+            )
+        }
         Row(
             modifier = Modifier
                 .weight(0.35f)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .weight(0.6f)
+                    .weight(0.65f)
                     .height(72.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(keyPadBackground),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = stringResource(R.string.empty_large_transaction),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-                )
+                if (largestTransaction?.createdAt == null && largestTransaction?.transactionName == null
+                    && largestTransaction?.amount == null
+                ) {
+                    EmptyLargestTransaction()
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = largestTransaction.transactionName ?: "",
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontSize = 20.sp
+                                ),
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = largestTransaction.amount ?: "",
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontSize = 20.sp
+                                ),
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.largest_transaction),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontSize = 12.sp,
+                                )
+                            )
+                            Text(
+                                text = largestTransaction.createdAt ?: "",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontSize = 12.sp,
+                                )
+                            )
+                        }
+                    }
+                }
             }
             Box(
                 modifier = Modifier
@@ -104,8 +175,10 @@ fun DashboardSummary(
                         text = previousWeekSpend,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontSize = 20.sp,
-                            textAlign = TextAlign.Center
-                        )
+                            textAlign = TextAlign.Start
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = stringResource(R.string.previous_week),
@@ -120,6 +193,62 @@ fun DashboardSummary(
     }
 }
 
+@Composable
+private fun LargestTransactionCategoryAllTime(
+    categoryName: String,
+    categoryEmoji: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = categoryEmoji,
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp),
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(keyPadBackground)
+                .padding(8.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Text(
+                text = categoryName,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
+            )
+            Text(
+                text = stringResource(R.string.most_popular_category),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 12.sp,
+                    color = componentBackground.copy(alpha = 0.7f)
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun EmptyLargestTransaction(
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stringResource(R.string.empty_large_transaction),
+        style = MaterialTheme.typography.headlineMedium.copy(
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center
+        ),
+        modifier = modifier
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun DashboardStateSummaryPreview() {
@@ -127,7 +256,7 @@ private fun DashboardStateSummaryPreview() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(310.dp)
+                .height(380.dp)
                 .background(gradientBackground)
                 .padding(10.dp),
         ) {
@@ -145,7 +274,22 @@ private fun DashboardStateSummaryPreview() {
                         currency = CurrencyEnum.USD,
                         decimal = DecimalSeparatorEnum.Dot,
                         thousands = ThousandsSeparatorEnum.Comma
-                    )
+                    ),
+//                largestTransactionAllTime = CategoryWithEmoji(
+//                    categoryName = "Food & Groceries",
+//                    categoryEmoji = "\uD83C\uDF55"),
+//                largestTransaction = LargestTransaction(
+//                    transactionName = "Adobe Yearly",
+//                    amount = "-59.99".formatTotalSpend(
+//                        expensesFormat = ExpensesFormatEnum.MinusPrefix,
+//                        currency = CurrencyEnum.USD,
+//                        decimal = DecimalSeparatorEnum.Dot,
+//                        thousands = ThousandsSeparatorEnum.Comma
+//                    ),
+//                    createdAt = System.currentTimeMillis().formatTimestamp(),
+//                ),
+                largestTransactionAllTime = null,
+                largestTransaction = null
             )
         }
     }

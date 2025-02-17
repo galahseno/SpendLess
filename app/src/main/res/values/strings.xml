@@ -52,4 +52,6 @@
     <string name="session_expiry_duration">Session expiry duration</string>
     <string name="locked_out_duration">Locked out duration</string>
     <string name="save">Save</string>
+    <string name="most_popular_category">Most popular category</string>
+    <string name="largest_transaction">Largest transaction</string>
 </resources>

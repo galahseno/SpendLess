@@ -15,7 +15,7 @@ class SettingPreferencesImpl(
     private val dataStore: DataStore<Preferences>
 ) : SettingPreferences {
 
-    override fun getUserStatus(): Flow<Int> {
+    override fun getUserId(): Flow<Int> {
         return dataStore.data.map { preferences ->
             preferences[USER_ID_KEY] ?: -1
         }

@@ -6,10 +6,12 @@ import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.AddTransaction
+import id.dev.spendless.core.domain.model.TransactionModel
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
+import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
+import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.transaction.TransactionCategoryEnum
 import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
 import id.dev.spendless.core.presentation.ui.transaction.repeat_interval.RepeatIntervalEnum
@@ -37,9 +39,15 @@ class AddTransactionViewModel(
 
     init {
         settingPreferences
-            .getUserStatus()
-            .onEach { userId ->
-                if (userId != -1) _state.update { it.copy(userId = userId) }
+            .getUserSession()
+            .onEach { session ->
+                _state.update {
+                    it.copy(
+                        expenseFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
+                        currency = CurrencyEnum.valueOf(session.currencySymbol),
+                        hintFormatSeparator = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
+                    )
+                }
             }
             .launchIn(viewModelScope)
 
@@ -163,6 +171,7 @@ class AddTransactionViewModel(
         }
     }
 
+    // TODO Handle thousand separator
     private fun handleExpenseOrIncomeAmountChanged(
         transactionType: TransactionTypeEnum,
         value: String
@@ -226,19 +235,17 @@ class AddTransactionViewModel(
     private fun handleAddTransaction() {
         viewModelScope.launch {
             val transactionData = when (_state.value.selectedTransactionType) {
-                TransactionTypeEnum.Expenses -> AddTransaction(
-                    userId = _state.value.userId,
+                TransactionTypeEnum.Expenses -> TransactionModel(
                     transactionName = _state.value.expenseName,
                     categoryEmoji = _state.value.selectedExpenseCategory.categoryEmoji,
                     categoryName = _state.value.selectedExpenseCategory.categoryName,
-                    amount = _state.value.expenseAmount.toDouble(),
+                    amount = _state.value.expenseAmount.toDouble().unaryMinus(),
                     note = _state.value.expensesNote,
                     createdAt = System.currentTimeMillis(),
                     repeat = _state.value.selectedExpenseRepeatInterval.repeatName
                 )
 
-                TransactionTypeEnum.Income -> AddTransaction(
-                    userId = _state.value.userId,
+                TransactionTypeEnum.Income -> TransactionModel(
                     transactionName = _state.value.incomeName,
                     categoryEmoji = TransactionCategoryEnum.Income.categoryEmoji,
                     categoryName = TransactionCategoryEnum.Income.categoryName,
@@ -265,6 +272,16 @@ class AddTransactionViewModel(
 
                 is Result.Success -> {
                     _event.send(AddTransactionEvent.OnAddTransactionSuccess)
+                    _state.update {
+                        it.copy(
+                            expenseName = "",
+                            expenseAmount = "",
+                            expensesNote = "",
+                            incomeName = "",
+                            incomeAmount = "",
+                            incomeNote = "",
+                        )
+                    }
                 }
             }
         }

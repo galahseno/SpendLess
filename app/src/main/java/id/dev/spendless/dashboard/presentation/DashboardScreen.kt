@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import id.dev.spendless.core.domain.model.LargestTransaction
 import id.dev.spendless.core.presentation.add_transaction.AddTransactionScreenRoot
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.component.SpendLessFab
@@ -36,15 +37,22 @@ import id.dev.spendless.core.presentation.design_system.component.transaction.Em
 import id.dev.spendless.core.presentation.design_system.gradientBackground
 import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
+import id.dev.spendless.core.presentation.ui.formatTotalSpend
+import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
+import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
+import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
+import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 import id.dev.spendless.dashboard.presentation.component.DashboardSummary
 import id.dev.spendless.dashboard.presentation.component.LatestTransaction
 import id.dev.spendless.dashboard.presentation.component.TopAppBarDashboard
+import id.dev.spendless.dashboard.presentation.util.formatTimestamp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DashboardScreenRoot(
     onNavigateToAllTransaction: () -> Unit,
+    onNavigateToSettingScreen: () -> Unit,
     viewModel: DashboardViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -64,6 +72,7 @@ fun DashboardScreenRoot(
         onAction = { action ->
             when (action) {
                 is DashboardAction.OnShowAllClick -> onNavigateToAllTransaction()
+                is DashboardAction.OnSettingClick -> onNavigateToSettingScreen()
             }
             viewModel.onAction(action)
         }
@@ -84,6 +93,9 @@ private fun DashboardScreen(
         topBar = {
             TopAppBarDashboard(
                 username = state.username,
+                onSettingClick = {
+                    onAction(DashboardAction.OnSettingClick)
+                }
             )
         },
         floatingActionButton = {
@@ -105,13 +117,15 @@ private fun DashboardScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.5f)
+                    .fillMaxHeight(0.49f)
                     .padding(top = 64.dp + 8.dp, start = 12.dp, end = 12.dp)
                     .systemBarsPadding(),
             ) {
                 DashboardSummary(
                     balance = state.balance,
                     previousWeekSpend = state.previousWeekSpend,
+                    largestTransaction = state.largestTransaction,
+                    largestTransactionAllTime = state.largestTransactionCategoryAllTime,
                     modifier = Modifier
                         .fillMaxSize(),
                 )
@@ -119,12 +133,13 @@ private fun DashboardScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.495f)
+                    .fillMaxHeight(0.5f)
                     .align(Alignment.BottomCenter)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(screenBackground)
             ) {
-                if (state.transaction) {
+                // TODO check if transaction is null
+                if (state.largestTransaction.transactionName != null) {
                     LatestTransaction(
                         onShowAllClick = {
                             onAction(DashboardAction.OnShowAllClick)
@@ -168,7 +183,16 @@ private fun DashboardScreenPreview() {
         DashboardScreen(
             state = DashboardState(
                 username = "rockefeller74",
-                transaction = true
+                largestTransaction = LargestTransaction(
+                    transactionName = "Adobe Yearly",
+                    amount = "-59.99".formatTotalSpend(
+                        expensesFormat = ExpensesFormatEnum.MinusPrefix,
+                        currency = CurrencyEnum.USD,
+                        decimal = DecimalSeparatorEnum.Dot,
+                        thousands = ThousandsSeparatorEnum.Comma
+                    ),
+                    createdAt = System.currentTimeMillis().formatTimestamp(),
+                )
             ),
             onAction = {}
         )

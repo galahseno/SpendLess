@@ -4,7 +4,7 @@ import id.dev.spendless.core.domain.model.UserSession
 import kotlinx.coroutines.flow.Flow
 
 interface SettingPreferences {
-    fun getUserStatus(): Flow<Int>
+    fun getUserId(): Flow<Int>
     fun getUserSession(): Flow<UserSession>
 
     suspend fun saveRegisterSession(
