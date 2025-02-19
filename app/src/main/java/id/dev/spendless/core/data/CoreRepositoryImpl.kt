@@ -2,7 +2,7 @@ package id.dev.spendless.core.data
 
 import id.dev.spendless.core.data.database.dao.TransactionDao
 import id.dev.spendless.core.domain.CoreRepository
-import id.dev.spendless.core.domain.model.TransactionModel
+import id.dev.spendless.core.domain.model.AddTransactionModel
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.data.util.toTransactionEntity
@@ -15,11 +15,11 @@ class CoreRepositoryImpl(
     private val transactionDao: TransactionDao,
     private val settingPreferences: SettingPreferences
 ) : CoreRepository {
-    override suspend fun createTransaction(transactionModel: TransactionModel): Result<Unit, DataError.Local> {
+    override suspend fun createTransaction(addTransactionModel: AddTransactionModel): Result<Unit, DataError.Local> {
         try {
             val userId = settingPreferences.getUserId().first()
             val transactionId =
-                transactionDao.createTransaction(transactionModel.toTransactionEntity(userId))
+                transactionDao.createTransaction(addTransactionModel.toTransactionEntity(userId))
 
             if (transactionId == -1L) {
                 return Result.Error(DataError.Local.ERROR_PROSES)

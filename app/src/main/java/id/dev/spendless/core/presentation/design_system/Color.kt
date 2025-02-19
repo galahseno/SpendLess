@@ -21,6 +21,9 @@ val settingIconsBackground = Color(0XFFF6F3F3)
 val logOutColor = Color(0XFFA40019)
 val secondaryColor = Color(0xFFE5EA58)
 val repeatIntervalBackgroundColor = Color(0xFFC4E0F9)
+val noteExpenseColor = Color(0xFF8138FF)
+val noteIncomeColor = Color(0xFFC9CE3E)
+val emojiIncomeBackground = Color(0x66E5EA58)
 
 val gradientBackground = Brush.radialGradient(
     colors = listOf(

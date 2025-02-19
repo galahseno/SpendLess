@@ -1,6 +1,7 @@
 package id.dev.spendless.transaction.presentation
 
+import id.dev.spendless.core.domain.model.TransactionGroup
+
 data class AllTransactionState(
-    val transaction: Boolean = false,
-    //
+    val allTransactions: List<TransactionGroup> = emptyList()
 )

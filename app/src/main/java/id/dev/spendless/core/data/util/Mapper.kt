@@ -1,9 +1,10 @@
 package id.dev.spendless.core.data.util
 
 import id.dev.spendless.core.data.database.entity.TransactionEntity
-import id.dev.spendless.core.domain.model.TransactionModel
+import id.dev.spendless.core.domain.model.AddTransactionModel
+import id.dev.spendless.core.domain.model.Transaction
 
-fun TransactionModel.toTransactionEntity(userId: Int): TransactionEntity {
+fun AddTransactionModel.toTransactionEntity(userId: Int): TransactionEntity {
     return TransactionEntity(
         userId = userId,
         transactionName = transactionName,
@@ -13,5 +14,17 @@ fun TransactionModel.toTransactionEntity(userId: Int): TransactionEntity {
         note = note,
         createdAt = createdAt,
         repeat = repeat
+    )
+}
+
+fun TransactionEntity.toTransaction(): Transaction {
+    return Transaction(
+        id = id,
+        transactionName = transactionName,
+        categoryEmoji = categoryEmoji,
+        categoryName = categoryName,
+        amount = amount.toString(),
+        note = note,
+        createdAt = createdAt,
     )
 }

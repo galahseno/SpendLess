@@ -73,6 +73,7 @@ fun DashboardScreenRoot(
             when (action) {
                 is DashboardAction.OnShowAllClick -> onNavigateToAllTransaction()
                 is DashboardAction.OnSettingClick -> onNavigateToSettingScreen()
+                else -> {}
             }
             viewModel.onAction(action)
         }
@@ -138,15 +139,18 @@ private fun DashboardScreen(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(screenBackground)
             ) {
-                // TODO check if transaction is null
-                if (state.largestTransaction.transactionName != null) {
+                if (state.allTransactions.isNotEmpty()) {
                     LatestTransaction(
                         onShowAllClick = {
                             onAction(DashboardAction.OnShowAllClick)
                         },
+                        onItemClick = {
+                            onAction(DashboardAction.OnItemTransactionClick(it))
+                        },
+                        allTransactions = state.allTransactions,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 16.dp, start = 16.dp, end = 10.dp)
+                            .padding(top = 16.dp, start = 16.dp, end = 10.dp),
                     )
                 } else {
                     EmptyTransaction(

@@ -38,4 +38,7 @@ interface TransactionDao {
         userId: Int,
         startOfPreviousWeek: Long, startOfCurrentWeek: Long
     ): Flow<Double?>
+
+    @Query("SELECT * FROM transactions WHERE user_id = :userId ORDER BY createdAt DESC")
+    fun getAllTransactions(userId: Int): Flow<List<TransactionEntity>>
 }

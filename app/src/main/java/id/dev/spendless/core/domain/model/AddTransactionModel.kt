@@ -1,6 +1,6 @@
 package id.dev.spendless.core.domain.model
 
-data class TransactionModel(
+data class AddTransactionModel(
     val transactionName: String,
     val categoryEmoji: String,
     val categoryName: String,

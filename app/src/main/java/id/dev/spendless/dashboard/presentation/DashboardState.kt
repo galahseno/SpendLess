@@ -2,6 +2,7 @@ package id.dev.spendless.dashboard.presentation
 
 import id.dev.spendless.core.domain.model.CategoryWithEmoji
 import id.dev.spendless.core.domain.model.LargestTransaction
+import id.dev.spendless.core.domain.model.TransactionGroup
 
 data class DashboardState(
     val username: String = "",
@@ -9,5 +10,6 @@ data class DashboardState(
     val previousWeekSpend: String = "0",
     val largestTransactionCategoryAllTime: CategoryWithEmoji = CategoryWithEmoji(),
     val largestTransaction: LargestTransaction = LargestTransaction(),
+    val allTransactions: List<TransactionGroup> = emptyList()
     //
 )

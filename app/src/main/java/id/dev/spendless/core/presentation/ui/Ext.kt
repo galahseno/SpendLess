@@ -7,6 +7,8 @@ import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 fun String.formatTotalSpend(
@@ -56,5 +58,19 @@ fun String.formatTotalSpend(
                 ExpensesFormatEnum.RoundBrackets -> ")"
             }
         )
+    }
+}
+
+fun LocalDate.formatDateForHeader(): String {
+    val today = LocalDate.now()
+    val yesterday = today.minusDays(1)
+
+    return when (this) {
+        today -> "Today"
+        yesterday -> "Yesterday"
+        else -> {
+            val formatter = DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())
+            this.format(formatter)
+        }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -19,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.dev.spendless.core.presentation.add_transaction.AddTransactionScreenRoot
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.component.SpendLessFab
 import id.dev.spendless.core.presentation.design_system.component.transaction.EmptyTransaction
+import id.dev.spendless.core.presentation.design_system.component.transaction.TransactionLazyList
 import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.transaction.presentation.component.TopAppBarAllTransaction
@@ -53,6 +56,7 @@ fun AllTransactionScreenRoot(
         onAction = { action ->
             when (action) {
                 is AllTransactionAction.OnBackClick -> onBackClick()
+                else -> {}
             }
             viewModel.onAction(action)
         }
@@ -98,8 +102,17 @@ private fun AllTransactionScreen(
                 .consumeWindowInsets(it),
             contentAlignment = Alignment.Center
         ) {
-            if (state.transaction) {
-
+            if (state.allTransactions.isNotEmpty()) {
+                TransactionLazyList(
+                    allTransactions = state.allTransactions,
+                    onItemClick = {
+                        onAction(AllTransactionAction.OnItemTransactionClick(it))
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)
+                        .padding(top = 8.dp, start = 16.dp, end = 8.dp),
+                )
             } else {
                 EmptyTransaction(
                     modifier = Modifier

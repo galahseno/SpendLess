@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.TransactionModel
+import id.dev.spendless.core.domain.model.AddTransactionModel
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
@@ -235,7 +235,7 @@ class AddTransactionViewModel(
     private fun handleAddTransaction() {
         viewModelScope.launch {
             val transactionData = when (_state.value.selectedTransactionType) {
-                TransactionTypeEnum.Expenses -> TransactionModel(
+                TransactionTypeEnum.Expenses -> AddTransactionModel(
                     transactionName = _state.value.expenseName,
                     categoryEmoji = _state.value.selectedExpenseCategory.categoryEmoji,
                     categoryName = _state.value.selectedExpenseCategory.categoryName,
@@ -245,7 +245,7 @@ class AddTransactionViewModel(
                     repeat = _state.value.selectedExpenseRepeatInterval.repeatName
                 )
 
-                TransactionTypeEnum.Income -> TransactionModel(
+                TransactionTypeEnum.Income -> AddTransactionModel(
                     transactionName = _state.value.incomeName,
                     categoryEmoji = TransactionCategoryEnum.Income.categoryEmoji,
                     categoryName = TransactionCategoryEnum.Income.categoryName,
@@ -280,6 +280,9 @@ class AddTransactionViewModel(
                             incomeName = "",
                             incomeAmount = "",
                             incomeNote = "",
+                            selectedExpenseCategory = TransactionCategoryEnum.Other,
+                            selectedExpenseRepeatInterval = RepeatIntervalEnum.DoesNotRepeat,
+                            selectedIncomeRepeatInterval = RepeatIntervalEnum.DoesNotRepeat
                         )
                     }
                 }

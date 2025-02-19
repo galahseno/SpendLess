@@ -1,13 +1,16 @@
 package id.dev.spendless.dashboard.data
 
 import id.dev.spendless.core.data.database.dao.TransactionDao
+import id.dev.spendless.core.data.util.toTransaction
 import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.model.Transaction
 import id.dev.spendless.core.domain.model.CategoryWithEmoji
 import id.dev.spendless.core.domain.model.LargestTransaction
 import id.dev.spendless.dashboard.domain.DashboardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -53,6 +56,14 @@ class DashboardRepositoryImpl(
                 startOfPreviousWeekTimestamp,
                 startOfCurrentWeekTimestamp
             )
+        }
+    }
+
+    override fun getAllTransactions(): Flow<List<Transaction>> {
+        return settingPreferences.getUserId().flatMapConcat { userId ->
+            transactionDao.getAllTransactions(userId).map { transactions ->
+                transactions.map { it.toTransaction() }
+            }
         }
     }
 
