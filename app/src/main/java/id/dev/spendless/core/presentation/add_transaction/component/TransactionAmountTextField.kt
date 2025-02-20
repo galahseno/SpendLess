@@ -75,7 +75,7 @@ fun TransactionAmountTextField(
             cursorBrush = SolidColor(buttonBackground),
             decorationBox = { innerBox ->
                 Row(
-                    modifier = Modifier.width(IntrinsicSize.Min),
+                    modifier = Modifier.width(IntrinsicSize.Max),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -114,7 +114,7 @@ fun TransactionAmountTextField(
                                 },
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Start
                             )
                         }
                         innerBox()

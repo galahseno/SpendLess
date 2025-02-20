@@ -31,8 +31,8 @@ import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 @Composable
 fun ThousandSeparator(
     selectedSeparator: ThousandsSeparatorEnum,
-    modifier: Modifier = Modifier,
-    onExpensesSelected: (ThousandsSeparatorEnum) -> Unit
+    onExpensesSelected: (ThousandsSeparatorEnum) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var fromSeparator by remember {
         mutableStateOf(selectedSeparator)
@@ -72,7 +72,6 @@ fun ThousandSeparator(
                     }
                 )
             }
-
         }
     }
 }

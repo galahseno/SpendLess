@@ -61,7 +61,7 @@ fun RegisterScreenRoot(
         when (event) {
             is RegisterEvent.OnProcessUsernameExists -> onSuccessCheckUsername()
             is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
-            else -> {}
+            else -> Unit
         }
     }
 
@@ -70,7 +70,7 @@ fun RegisterScreenRoot(
         onAction = { action ->
             when (action) {
                 is RegisterAction.OnLoginClick -> onNavigateToLogin()
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }

@@ -92,7 +92,7 @@ class AllTransactionViewModel(
                 }
             }
 
-            else -> {}
+            else -> Unit
         }
     }
 }

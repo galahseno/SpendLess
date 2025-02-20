@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,7 @@ import id.dev.spendless.core.presentation.design_system.screenBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarAllTransaction(
+fun AllTransactionTopAppBar(
     onBackClick: () -> Unit,
     onExportClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -45,7 +46,7 @@ fun TopAppBarAllTransaction(
         },
         title = {
             Text(
-                text = "All Transactions",
+                text = stringResource(R.string.all_transactions),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = 20.sp
                 )
@@ -76,7 +77,7 @@ private fun TopAppBarAllTransactionPreview() {
         Box(
             modifier = Modifier.background(screenBackground)
         ) {
-            TopAppBarAllTransaction(
+            AllTransactionTopAppBar(
                 onBackClick = {},
                 onExportClick = {}
             )

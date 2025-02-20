@@ -55,6 +55,7 @@ class DashboardViewModel(
                         decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
                         thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
                     ),
+                    negativeBalance = balance?.let { it < 0.0 } ?: true,
                     previousWeekSpend = totalSpendPreviousWeek.toString().formatTotalSpend(
                         expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
                         currency = CurrencyEnum.valueOf(session.currencySymbol),
@@ -140,7 +141,7 @@ class DashboardViewModel(
                 }
             }
 
-            else -> {}
+            else -> Unit
         }
     }
 }

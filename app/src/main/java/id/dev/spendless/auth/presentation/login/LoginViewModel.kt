@@ -63,7 +63,7 @@ class LoginViewModel(
             }
 
             is LoginAction.OnLoginClick -> handleLoginAccount()
-            else -> {}
+            else -> Unit
         }
     }
 

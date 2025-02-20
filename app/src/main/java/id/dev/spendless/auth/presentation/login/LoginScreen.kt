@@ -76,7 +76,7 @@ fun LoginScreenRoot(
         onAction = { action ->
             when (action) {
                 is LoginAction.OnRegisterClick -> onNavigateToRegister()
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }

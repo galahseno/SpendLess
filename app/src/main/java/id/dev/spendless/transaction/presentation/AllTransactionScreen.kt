@@ -30,7 +30,7 @@ import id.dev.spendless.core.presentation.design_system.component.transaction.Em
 import id.dev.spendless.core.presentation.design_system.component.transaction.TransactionLazyList
 import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
-import id.dev.spendless.transaction.presentation.component.TopAppBarAllTransaction
+import id.dev.spendless.transaction.presentation.component.AllTransactionTopAppBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -56,7 +56,7 @@ fun AllTransactionScreenRoot(
         onAction = { action ->
             when (action) {
                 is AllTransactionAction.OnBackClick -> onBackClick()
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }
@@ -75,7 +75,7 @@ private fun AllTransactionScreen(
 
     Scaffold(
         topBar = {
-            TopAppBarAllTransaction(
+            AllTransactionTopAppBar(
                 modifier = Modifier,
                 onBackClick = {
                     onAction(AllTransactionAction.OnBackClick)

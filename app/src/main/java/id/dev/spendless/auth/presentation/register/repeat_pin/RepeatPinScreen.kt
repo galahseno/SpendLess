@@ -64,7 +64,7 @@ fun RepeatPinScreenRoot(
         when (event) {
             is RegisterEvent.OnProcessToOnboardingPreferences -> onProcessToOnboardingPreferences()
             is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
-            else -> {}
+            else -> Unit
         }
     }
 
@@ -82,7 +82,7 @@ fun RepeatPinScreenRoot(
                     onBackClick()
                 }
 
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }

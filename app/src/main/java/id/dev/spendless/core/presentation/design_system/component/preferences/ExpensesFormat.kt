@@ -35,7 +35,7 @@ fun ExpensesFormat(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(44.dp)
+            .height(48.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(buttonBackground.copy(alpha = .08f))
             .padding(4.dp),

@@ -3,13 +3,12 @@ package id.dev.spendless.settings.presentation.security
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,33 +24,44 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.dev.spendless.R
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
-import id.dev.spendless.core.presentation.design_system.buttonBackground
+import id.dev.spendless.core.presentation.design_system.component.SpendLessButton
+import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.settings.presentation.SettingsAction
+import id.dev.spendless.settings.presentation.SettingsEvent
 import id.dev.spendless.settings.presentation.SettingsState
 import id.dev.spendless.settings.presentation.SettingsViewModel
-import id.dev.spendless.settings.presentation.component.MultipleSegmentedButtonsCreator
-import id.dev.spendless.settings.presentation.component.SettingText
+import id.dev.spendless.settings.presentation.component.SettingsTopAppBar
+import id.dev.spendless.settings.presentation.security.component.BiometricPromptStatus
+import id.dev.spendless.settings.presentation.security.component.LockedOutDuration
+import id.dev.spendless.settings.presentation.security.component.SessionExpiryDuration
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SecurityScreenRoot(
-
+    onBackClick: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ObserveAsEvents(viewModel.event) {
-
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            is SettingsEvent.OnSuccessSavePreferences -> onBackClick()
+        }
     }
 
     SecurityScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when (action) {
+                is SettingsAction.OnBackClick -> onBackClick()
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SecurityScreen(
     state: SettingsState,
@@ -59,107 +69,78 @@ private fun SecurityScreen(
 ) {
 
     Scaffold(
-        topBar = { SecurityAppBar() }
-    ) { innerPading ->
-
+        topBar = {
+            SettingsTopAppBar(
+                titleAppBar = stringResource(R.string.security),
+                modifier = Modifier,
+                onBackClick = {
+                    onAction(SettingsAction.OnBackClick)
+                }
+            )
+        },
+        containerColor = screenBackground,
+    ) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(innerPading)
-                .fillMaxWidth()
-                .height(320.dp)
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .height(72.dp)
-                        .fillMaxWidth()
-                ) {
-
-                    SettingText(text = stringResource(R.string.biometric_for_pin_prompt))
-
-                    MultipleSegmentedButtonsCreator(
-                        list = listOf("Enable", "Disable"),
-                        selectedIndex = 0
-                    )
-
-                }
-
-                Spacer(
-                    Modifier
-                        .height(10.dp)
-                        .fillMaxWidth()
+            Text(
+                text = stringResource(R.string.biometric_for_pin_prompt),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp
                 )
-
-                Column(
-                    modifier = Modifier
-                        .height(72.dp)
-                        .fillMaxWidth()
-                ) {
-
-                    SettingText(text = stringResource(R.string.session_expiry_duration))
-
-                    MultipleSegmentedButtonsCreator(
-                        list = listOf("5 min", "15 min", "30 min", "1 hour"),
-                        selectedIndex = 0
-                    )
-
+            )
+            BiometricPromptStatus(
+                status = state.biometricsEnabled,
+                onStatusSelected = {
+                    onAction(SettingsAction.OnBiometricStatusChanged(it))
                 }
-
-                Spacer(
-                    Modifier
-                        .height(10.dp)
-                        .fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.session_expiry_duration),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp
                 )
-
-                Column(
-                    modifier = Modifier
-                        .height(72.dp)
-                        .fillMaxWidth()
-                ){
-
-                    SettingText(text = stringResource(R.string.locked_out_duration))
-
-                    MultipleSegmentedButtonsCreator(
-                        list = listOf("15 sec", "30 sec", "1 min ", "5 min"),
-                        selectedIndex = 0
-                    )
-
+            )
+            SessionExpiryDuration(
+                selectedDuration = state.sessionExpiryDuration,
+                onSelectedDuration = {
+                    onAction(SettingsAction.OnSessionExpiryDurationChanged(it))
                 }
-
-
-            }
-
-            Button(
-                onClick = {},
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonBackground
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 8.dp)
-
-            ) {
-                Text(
-                    text = "Save",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.locked_out_duration),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp
                 )
-            }
+            )
+            LockedOutDuration(
+                selectedDuration = state.lockedOutDuration,
+                onSelectedDuration = {
+                    onAction(SettingsAction.OnLockedOutDurationChanged(it))
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            SpendLessButton(
+                modifier = Modifier.fillMaxWidth(),
+                enable = true,
+                text = stringResource(R.string.save),
+                onClick = {
+                    onAction(SettingsAction.OnSaveSecurity)
+                }
+            )
         }
-
-
     }
-
 }
 
 @Preview(showBackground = true)

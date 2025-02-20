@@ -79,7 +79,7 @@ class RegisterViewModel(
             is RegisterAction.OnDecimalSeparatorSelected -> handleSelectedDecimalSeparator(action.separator)
             is RegisterAction.OnThousandSeparatorSelected -> handleSelectedThousandSeparator(action.separator)
             is RegisterAction.OnRegisterAccount -> handleRegisterAccount()
-            else -> {}
+            else -> Unit
         }
     }
 

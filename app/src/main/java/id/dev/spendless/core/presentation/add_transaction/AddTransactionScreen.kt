@@ -37,11 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import id.dev.spendless.R
 import id.dev.spendless.core.presentation.add_transaction.component.AddTransactionAppBar
 import id.dev.spendless.core.presentation.add_transaction.component.AddTransactionType
 import id.dev.spendless.core.presentation.add_transaction.component.ExpenseCategoryDropDown
@@ -57,6 +59,8 @@ import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
 import id.dev.spendless.core.presentation.design_system.sheetBackground
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.core.presentation.ui.keyboardOpenAsState
+import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
+import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.transaction.TransactionTypeEnum
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -92,7 +96,7 @@ fun AddTransactionScreenRoot(
             onAction = { action ->
                 when (action) {
                     is AddTransactionAction.OnCloseModalSheet -> onDismissRequest()
-                    else -> {}
+                    else -> Unit
                 }
                 viewModel.onAction(action)
             }
@@ -223,12 +227,14 @@ private fun AddTransactionScreen(
                             TransactionTypeEnum.Income -> state.incomeAmount
                         },
                         onTextChanged = { text ->
-                            onAction(
-                                AddTransactionAction.OnExpenseOrIncomeAmountChanged(
-                                    TransactionTypeEnum.entries[page],
-                                    text
+                            if (text.length <= 14) {
+                                onAction(
+                                    AddTransactionAction.OnExpenseOrIncomeAmountChanged(
+                                        TransactionTypeEnum.entries[page],
+                                        text
+                                    )
                                 )
-                            )
+                            }
                         },
                         transactionType = TransactionTypeEnum.entries[page],
                         hintFormatSeparator = state.hintFormatSeparator,
@@ -322,7 +328,7 @@ private fun AddTransactionScreen(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     SpendLessButton(
-                        text = "Create",
+                        text = stringResource(R.string.create),
                         enable = state.canAddTransaction,
                         onClick = {
                             onAction(AddTransactionAction.OnAddTransaction)
@@ -351,7 +357,10 @@ private fun AddTransactionScreen(
 private fun AddTransactionScreenPreview() {
     SpendLessTheme {
         AddTransactionScreen(
-            state = AddTransactionState(),
+            state = AddTransactionState(
+                expenseFormat = ExpensesFormatEnum.MinusPrefix,
+                currency = CurrencyEnum.IDR
+            ),
             onAction = {}
         )
     }

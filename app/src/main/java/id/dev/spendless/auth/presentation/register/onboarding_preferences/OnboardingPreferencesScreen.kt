@@ -67,7 +67,7 @@ fun OnboardingPreferencesScreenRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
-            else -> {}
+            else -> Unit
         }
     }
 
@@ -85,7 +85,7 @@ fun OnboardingPreferencesScreenRoot(
                     onBackClick()
                 }
 
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }
@@ -140,7 +140,7 @@ private fun OnboardingPreferencesScreen(
                 totalSpend = state.formattedTotalSpend,
                 modifier = Modifier.height(106.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             Text(
                 text = stringResource(R.string.expenses_format),
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -148,7 +148,6 @@ private fun OnboardingPreferencesScreen(
                     fontSize = 14.sp
                 )
             )
-            Spacer(modifier = Modifier.height(0.5.dp))
             ExpensesFormat(
                 selectedExpenseFormat = state.selectedExpenseFormat,
                 currency = state.selectedCurrency.symbol,
@@ -156,7 +155,7 @@ private fun OnboardingPreferencesScreen(
                     onAction(RegisterAction.OnExpensesFormatSelected(it))
                 }
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.currency_format),
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -184,7 +183,7 @@ private fun OnboardingPreferencesScreen(
                     onAction(RegisterAction.OnDecimalSeparatorSelected(it))
                 }
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.thousand_separator),
                 style = MaterialTheme.typography.titleMedium.copy(

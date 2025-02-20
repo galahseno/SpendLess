@@ -20,6 +20,7 @@ enum class DayOfWeekEnum(val dayOfWeek: DayOfWeek) {
     }
 }
 
+// TODO ovveride toString
 enum class RepeatIntervalEnum(
     val repeatName: String,
     val formattedDate: String = "",

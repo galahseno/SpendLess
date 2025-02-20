@@ -44,7 +44,7 @@ import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 import id.dev.spendless.dashboard.presentation.component.DashboardSummary
 import id.dev.spendless.dashboard.presentation.component.LatestTransaction
-import id.dev.spendless.dashboard.presentation.component.TopAppBarDashboard
+import id.dev.spendless.dashboard.presentation.component.DashboardTopAppBar
 import id.dev.spendless.dashboard.presentation.util.formatTimestamp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -73,7 +73,7 @@ fun DashboardScreenRoot(
             when (action) {
                 is DashboardAction.OnShowAllClick -> onNavigateToAllTransaction()
                 is DashboardAction.OnSettingClick -> onNavigateToSettingScreen()
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }
@@ -92,7 +92,7 @@ private fun DashboardScreen(
 
     Scaffold(
         topBar = {
-            TopAppBarDashboard(
+            DashboardTopAppBar(
                 username = state.username,
                 onSettingClick = {
                     onAction(DashboardAction.OnSettingClick)
@@ -124,6 +124,7 @@ private fun DashboardScreen(
             ) {
                 DashboardSummary(
                     balance = state.balance,
+                    negativeBalance = state.negativeBalance,
                     previousWeekSpend = state.previousWeekSpend,
                     largestTransaction = state.largestTransaction,
                     largestTransactionAllTime = state.largestTransactionCategoryAllTime,

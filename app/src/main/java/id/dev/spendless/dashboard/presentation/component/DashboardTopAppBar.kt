@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +30,7 @@ import id.dev.spendless.core.presentation.design_system.gradientBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarDashboard(
+fun DashboardTopAppBar(
     username: String,
     onSettingClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -79,7 +77,7 @@ fun TopAppBarDashboard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Settings,
+                    imageVector = ImageVector.vectorResource(R.drawable.setting_icon),
                     contentDescription = "export",
                     tint = Color.White,
                     modifier = Modifier
@@ -99,7 +97,7 @@ private fun TopAppBarDashboardPreview() {
         Box(
             modifier = Modifier.background(gradientBackground)
         ) {
-            TopAppBarDashboard(
+            DashboardTopAppBar(
                 username = "rockefeller74",
                 onSettingClick = {
 

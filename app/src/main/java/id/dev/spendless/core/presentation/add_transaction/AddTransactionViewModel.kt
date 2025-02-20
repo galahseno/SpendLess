@@ -152,7 +152,7 @@ class AddTransactionViewModel(
 
             is AddTransactionAction.OnAddTransaction -> handleAddTransaction()
 
-            else -> {}
+            else -> Unit
         }
     }
 
@@ -239,7 +239,8 @@ class AddTransactionViewModel(
                     transactionName = _state.value.expenseName,
                     categoryEmoji = _state.value.selectedExpenseCategory.categoryEmoji,
                     categoryName = _state.value.selectedExpenseCategory.categoryName,
-                    amount = _state.value.expenseAmount.toDouble().unaryMinus(),
+                    amount = _state.value.expenseAmount
+                        .replace(",", ".").toDouble().unaryMinus(),
                     note = _state.value.expensesNote,
                     createdAt = System.currentTimeMillis(),
                     repeat = _state.value.selectedExpenseRepeatInterval.repeatName
@@ -249,7 +250,7 @@ class AddTransactionViewModel(
                     transactionName = _state.value.incomeName,
                     categoryEmoji = TransactionCategoryEnum.Income.categoryEmoji,
                     categoryName = TransactionCategoryEnum.Income.categoryName,
-                    amount = _state.value.incomeAmount.toDouble(),
+                    amount = _state.value.incomeAmount.replace(",", ".").toDouble(),
                     note = _state.value.incomeNote,
                     createdAt = System.currentTimeMillis(),
                     repeat = _state.value.selectedIncomeRepeatInterval.repeatName

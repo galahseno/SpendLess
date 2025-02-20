@@ -221,6 +221,9 @@ private fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
     ) {
         composable<Screen.Settings.SettingsMenu> {
             SettingScreenRoot(
+                onBackClick = {
+                    navController.navigateUp()
+                },
                 onPreferencesClick = {
                     navController.navigate(Screen.Settings.SettingsMenu.Preferences)
                 },
@@ -231,12 +234,16 @@ private fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
         }
         composable<Screen.Settings.SettingsMenu.Preferences> {
             PreferencesScreenRoot(
-
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
         composable<Screen.Settings.SettingsMenu.Security> {
             SecurityScreenRoot(
-
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
     }

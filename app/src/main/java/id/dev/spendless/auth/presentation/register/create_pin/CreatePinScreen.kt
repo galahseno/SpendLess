@@ -63,7 +63,7 @@ fun CreatePinScreenRoot(
         when (event) {
             is RegisterEvent.OnProcessToRepeatPin -> onProcessToRepeatPin()
             is RegisterEvent.OnRegisterSuccess -> onSuccessRegister()
-            else -> {}
+            else -> Unit
         }
     }
 
@@ -72,7 +72,7 @@ fun CreatePinScreenRoot(
         onAction = { action ->
             when (action) {
                 is RegisterAction.OnBackClick -> onBackClick()
-                else -> {}
+                else -> Unit
             }
             viewModel.onAction(action)
         }

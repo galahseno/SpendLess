@@ -7,6 +7,7 @@ import id.dev.spendless.core.domain.model.TransactionGroup
 data class DashboardState(
     val username: String = "",
     val balance: String = "0",
+    val negativeBalance: Boolean = true,
     val previousWeekSpend: String = "0",
     val largestTransactionCategoryAllTime: CategoryWithEmoji = CategoryWithEmoji(),
     val largestTransaction: LargestTransaction = LargestTransaction(),

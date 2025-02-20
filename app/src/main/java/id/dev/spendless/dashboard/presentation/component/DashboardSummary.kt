@@ -29,6 +29,7 @@ import id.dev.spendless.R
 import id.dev.spendless.core.domain.model.CategoryWithEmoji
 import id.dev.spendless.core.domain.model.LargestTransaction
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
+import id.dev.spendless.core.presentation.design_system.balanceDashboardColor
 import id.dev.spendless.core.presentation.design_system.componentBackground
 import id.dev.spendless.core.presentation.design_system.gradientBackground
 import id.dev.spendless.core.presentation.design_system.keyPadBackground
@@ -38,10 +39,12 @@ import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
 import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
+import id.dev.spendless.dashboard.presentation.util.formatTimestamp
 
 @Composable
 fun DashboardSummary(
     balance: String,
+    negativeBalance: Boolean,
     previousWeekSpend: String,
     largestTransactionAllTime: CategoryWithEmoji?,
     largestTransaction: LargestTransaction?,
@@ -66,7 +69,10 @@ fun DashboardSummary(
             Spacer(modifier = Modifier.height(48.dp))
             Text(
                 text = balance,
-                style = MaterialTheme.typography.headlineLarge.copy(color = Color.White),
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    color = if (negativeBalance) Color.White
+                    else balanceDashboardColor
+                ),
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis
             )
@@ -120,21 +126,26 @@ fun DashboardSummary(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.Start
                         ) {
                             Text(
+                                modifier = Modifier.fillMaxWidth(0.4f),
                                 text = largestTransaction.transactionName ?: "",
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     fontSize = 20.sp
                                 ),
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
                             )
                             Text(
+                                modifier = Modifier.fillMaxWidth(1f),
                                 text = largestTransaction.amount ?: "",
                                 style = MaterialTheme.typography.headlineMedium.copy(
-                                    fontSize = 20.sp
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.End
                                 ),
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
                             )
                         }
                         Row(
@@ -268,6 +279,7 @@ private fun DashboardStateSummaryPreview() {
                         decimal = DecimalSeparatorEnum.Dot,
                         thousands = ThousandsSeparatorEnum.Comma
                     ),
+                negativeBalance = false,
                 previousWeekSpend = "0"
                     .formatTotalSpend(
                         expensesFormat = ExpensesFormatEnum.MinusPrefix,
@@ -275,21 +287,22 @@ private fun DashboardStateSummaryPreview() {
                         decimal = DecimalSeparatorEnum.Dot,
                         thousands = ThousandsSeparatorEnum.Comma
                     ),
-//                largestTransactionAllTime = CategoryWithEmoji(
-//                    categoryName = "Food & Groceries",
-//                    categoryEmoji = "\uD83C\uDF55"),
-//                largestTransaction = LargestTransaction(
-//                    transactionName = "Adobe Yearly",
-//                    amount = "-59.99".formatTotalSpend(
-//                        expensesFormat = ExpensesFormatEnum.MinusPrefix,
-//                        currency = CurrencyEnum.USD,
-//                        decimal = DecimalSeparatorEnum.Dot,
-//                        thousands = ThousandsSeparatorEnum.Comma
-//                    ),
-//                    createdAt = System.currentTimeMillis().formatTimestamp(),
-//                ),
-                largestTransactionAllTime = null,
-                largestTransaction = null
+                largestTransactionAllTime = CategoryWithEmoji(
+                    categoryName = "Food & Groceries",
+                    categoryEmoji = "\uD83C\uDF55"
+                ),
+                largestTransaction = LargestTransaction(
+                    transactionName = "Adobe Yearly",
+                    amount = "-59.99".formatTotalSpend(
+                        expensesFormat = ExpensesFormatEnum.MinusPrefix,
+                        currency = CurrencyEnum.USD,
+                        decimal = DecimalSeparatorEnum.Dot,
+                        thousands = ThousandsSeparatorEnum.Comma
+                    ),
+                    createdAt = System.currentTimeMillis().formatTimestamp(),
+                ),
+//                largestTransactionAllTime = null,
+//                largestTransaction = null
             )
         }
     }

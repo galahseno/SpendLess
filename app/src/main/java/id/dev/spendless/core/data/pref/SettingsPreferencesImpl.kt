@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.model.UserSecurity
 import id.dev.spendless.core.domain.model.UserSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,6 +30,16 @@ class SettingPreferencesImpl(
                 currencySymbol = it[CURRENCY_KEY] ?: "",
                 decimalSeparator = it[DECIMAL_SEPARATOR_KEY] ?: "",
                 thousandSeparator = it[THOUSAND_SEPARATOR_KEY] ?: "",
+            )
+        }
+    }
+
+    override fun getUserSecurity(): Flow<UserSecurity> {
+        return dataStore.data.map {
+            UserSecurity(
+                biometricPromptEnable = it[BIOMETRICS_KEY] ?: false,
+                sessionExpiryDuration = it[SESSION_EXPIRED_KEY] ?: 5,
+                lockedOutDuration = it[LOCKED_DURATION_KEY] ?: 15
             )
         }
     }
@@ -58,6 +69,32 @@ class SettingPreferencesImpl(
         dataStore.edit { preferences ->
             preferences[USER_ID_KEY] = userId
             preferences[USER_NAME_KEY] = username
+        }
+    }
+
+    override suspend fun updateUserSession(
+        expensesFormat: String,
+        currencySymbol: String,
+        decimalSeparator: String,
+        thousandSeparator: String
+    ) {
+        dataStore.edit { preferences ->
+            preferences[EXPENSES_FORMAT_KEY] = expensesFormat
+            preferences[CURRENCY_KEY] = currencySymbol
+            preferences[DECIMAL_SEPARATOR_KEY] = decimalSeparator
+            preferences[THOUSAND_SEPARATOR_KEY] = thousandSeparator
+        }
+    }
+
+    override suspend fun updateUserSecurity(
+        biometricPromptEnable: Boolean,
+        sessionExpiryDuration: Int,
+        lockedOutDuration: Int
+    ) {
+        dataStore.edit { preferences ->
+            preferences[BIOMETRICS_KEY] = biometricPromptEnable
+            preferences[SESSION_EXPIRED_KEY] = sessionExpiryDuration
+            preferences[LOCKED_DURATION_KEY] = lockedOutDuration
         }
     }
 

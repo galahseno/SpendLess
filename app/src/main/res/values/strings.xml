@@ -46,7 +46,7 @@
     <string name="add_note">Add Note</string>
     <string name="preferences">Preferences</string>
     <string name="security">Security</string>
-    <string name="Settings">Settings</string>
+    <string name="settings">Settings</string>
     <string name="log_out">Log out</string>
     <string name="biometric_for_pin_prompt">Biometric for PIN Prompt</string>
     <string name="session_expiry_duration">Session expiry duration</string>
@@ -54,4 +54,8 @@
     <string name="save">Save</string>
     <string name="most_popular_category">Most popular category</string>
     <string name="largest_transaction">Largest transaction</string>
+    <string name="all_transactions">All Transactions</string>
+    <string name="create">Create</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
 </resources>
