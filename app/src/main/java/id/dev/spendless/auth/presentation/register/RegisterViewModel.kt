@@ -45,6 +45,7 @@ class RegisterViewModel(
                         } else if (!isValidUsername(username)) {
                             UiText.StringResource(R.string.invalid_username)
                         } else null,
+                        // TODO enable button when username at least one character and display error message when username not valid (button click)
                         canRegister = !username.contains(" ") &&
                                 isValidUsername(username)
                     )

@@ -15,6 +15,7 @@ class CoreRepositoryImpl(
     private val transactionDao: TransactionDao,
     private val settingPreferences: SettingPreferences
 ) : CoreRepository {
+    // TODO Encrypt Transaction
     override suspend fun createTransaction(addTransactionModel: AddTransactionModel): Result<Unit, DataError.Local> {
         try {
             val userId = settingPreferences.getUserId().first()

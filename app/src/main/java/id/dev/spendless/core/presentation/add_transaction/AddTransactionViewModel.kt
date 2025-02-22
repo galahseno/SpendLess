@@ -232,6 +232,7 @@ class AddTransactionViewModel(
         }
     }
 
+    // TODO Trim traling when save transaction
     private fun handleAddTransaction() {
         viewModelScope.launch {
             val transactionData = when (_state.value.selectedTransactionType) {
@@ -291,7 +292,6 @@ class AddTransactionViewModel(
         }
     }
 
-    // TODO Trim traling when save transaction
     private fun trimTrailingExtraSpaces(input: String): String {
         if (input.isBlank()) {
             return ""

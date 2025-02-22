@@ -37,7 +37,7 @@ val coreDataModule = module {
             SpendLessDb::class.java,
             "spendless.db"
         )
-            // TODO uncomment to enable encryption
+            // TODO uncomment to enable db encryption
             //.openHelperFactory(supportFactory)
             .build()
     }

@@ -28,6 +28,7 @@ class AuthRepositoryImpl(
         }
     }
 
+    // TODO Encrypt PIN
     override suspend fun registerAccount(
         username: String,
         pin: String,
