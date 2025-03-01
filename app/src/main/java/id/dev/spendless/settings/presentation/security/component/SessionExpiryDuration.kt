@@ -1,6 +1,9 @@
 package id.dev.spendless.settings.presentation.security.component
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -31,7 +34,7 @@ fun SessionExpiryDuration(
     onSelectedDuration: (SessionExpiredEnum) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var fromSeparator by remember {
+    var fromDuration by remember {
         mutableStateOf(selectedDuration)
     }
 
@@ -50,12 +53,12 @@ fun SessionExpiryDuration(
                 modifier = Modifier.weight(1f),
                 targetState = selectedDuration,
                 // TODO handle animation
-//                transitionSpec = {
-//                    getThousandSeparatorTransitionSpec(separator, fromSeparator, targetState)
-//                }
+                transitionSpec = {
+                    EnterTransition.None togetherWith ExitTransition.None
+                }
             ) {
                 if (this.transition.currentState == this.transition.targetState) {
-                    fromSeparator = selectedDuration
+                    fromDuration = selectedDuration
                 }
                 BackgroundBox(
                     text = duration.toString(),

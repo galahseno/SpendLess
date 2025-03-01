@@ -20,13 +20,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 class AllTransactionViewModel(
     dashboardRepository: DashboardRepository,
-    settingPreferences: SettingPreferences
+    private val settingPreferences: SettingPreferences
 ) : ViewModel() {
     private val _state = MutableStateFlow(AllTransactionState())
     val state = _state.asStateFlow()
@@ -90,6 +91,19 @@ class AllTransactionViewModel(
                         }
                     )
                 }
+            }
+
+            is AllTransactionAction.OnFABClick -> {
+                viewModelScope.launch {
+                    val isSessionValid = settingPreferences.checkSessionExpired()
+                    if (isSessionValid) return@launch
+
+                    _state.update { it.copy(showBottomSheet = true) }
+                }
+            }
+
+            is AllTransactionAction.OnCloseBottomSheet -> {
+                _state.update { it.copy(showBottomSheet = false) }
             }
 
             else -> Unit

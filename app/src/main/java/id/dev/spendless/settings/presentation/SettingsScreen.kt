@@ -49,6 +49,7 @@ fun SettingScreenRoot(
     onBackClick: () -> Unit,
     onPreferencesClick: () -> Unit,
     onSecurityClick: () -> Unit,
+    onSuccessLogout: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -59,8 +60,11 @@ fun SettingScreenRoot(
         WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
     }
 
-    ObserveAsEvents(viewModel.event) {
-
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            is SettingsEvent.OnSuccessLogout -> onSuccessLogout()
+            else -> Unit
+        }
     }
 
     SettingScreen(
@@ -198,7 +202,7 @@ private fun SettingScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(sheetBackground)
+                            .background(errorBackground.copy(alpha = 0.08f))
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.logout_icon),

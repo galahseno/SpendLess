@@ -11,6 +11,9 @@ interface UserDao {
     @Query("Select Exists(Select * From user Where username = :username)")
     suspend fun isUserExist(username: String): Boolean
 
+    @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :userId AND pin = :pin)")
+    suspend fun checkSessionPin(userId: Int, pin: String): Boolean
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun createUser(user: UserEntity): Long
 

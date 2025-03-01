@@ -32,7 +32,14 @@ interface SettingPreferences {
 
     suspend fun updateUserSecurity(
         biometricPromptEnable: Boolean,
-        sessionExpiryDuration: Int,
-        lockedOutDuration: Int
+        sessionExpiryDuration: Long,
+        lockedOutDuration: Long
     )
+
+    suspend fun logout()
+
+    fun getSessionExpired(): Flow<Boolean>
+    suspend fun updateLatestTimeStamp()
+    suspend fun checkSessionExpired(): Boolean
+    suspend fun changeSession(value: Boolean)
 }

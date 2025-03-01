@@ -17,10 +17,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,8 +40,8 @@ import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
 import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 import id.dev.spendless.dashboard.presentation.component.DashboardSummary
-import id.dev.spendless.dashboard.presentation.component.LatestTransaction
 import id.dev.spendless.dashboard.presentation.component.DashboardTopAppBar
+import id.dev.spendless.dashboard.presentation.component.LatestTransaction
 import id.dev.spendless.dashboard.presentation.util.formatTimestamp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -88,7 +85,6 @@ private fun DashboardScreen(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -103,7 +99,7 @@ private fun DashboardScreen(
             SpendLessFab(
                 onClick = {
                     scope.launch {
-                        showBottomSheet = true
+                        onAction(DashboardAction.OnFABClick)
                     }
                 }
             )
@@ -162,7 +158,7 @@ private fun DashboardScreen(
             }
 
             AnimatedVisibility(
-                visible = showBottomSheet
+                visible = state.showBottomSheet
             ) {
                 AddTransactionScreenRoot(
                     sheetState = sheetState,
@@ -171,7 +167,7 @@ private fun DashboardScreen(
                             sheetState.hide()
                         }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
-                                showBottomSheet = false
+                                onAction(DashboardAction.OnCloseBottomSheet)
                             }
                         }
                     }

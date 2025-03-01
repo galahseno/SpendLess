@@ -80,7 +80,7 @@ private fun AnimatedContentTransitionScope<Boolean>.getStatusTransitionSpec(
     /**
      * If the expensesFormat is MinusPrefix
      **/
-    true -> {
+    status -> {
         slideIntoContainer(
             AnimatedContentTransitionScope.SlideDirection.Left
         ) togetherWith ExitTransition.None
@@ -88,7 +88,7 @@ private fun AnimatedContentTransitionScope<Boolean>.getStatusTransitionSpec(
     /**
      * If the target is MinusPrefix
      **/
-    false -> {
+    targetState -> {
         EnterTransition.None togetherWith slideOutOfContainer(
             AnimatedContentTransitionScope.SlideDirection.Left
         )

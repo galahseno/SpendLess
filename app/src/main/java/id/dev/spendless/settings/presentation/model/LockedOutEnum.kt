@@ -1,18 +1,19 @@
 package id.dev.spendless.settings.presentation.model
 
-enum class LockedOutEnum(val seconds: Int) {
-    FIFTEEN_SECONDS(15),
-    THIRTY_SECONDS(30),
-    ONE_MINUTE(60),
-    FIVE_MINUTES(300);
+// TODO impl
+enum class LockedOutEnum(val millis: Long) {
+    FIFTEEN_SECONDS(15000),
+    THIRTY_SECONDS(30000),
+    ONE_MINUTE(60000),
+    FIVE_MINUTES(300000);
 
     companion object {
-        fun fromSeconds(seconds: Int): LockedOutEnum {
-            return when (seconds) {
-                15 -> FIFTEEN_SECONDS
-                30 -> THIRTY_SECONDS
-                60 -> ONE_MINUTE
-                300 -> FIVE_MINUTES
+        fun fromSeconds(millis: Long): LockedOutEnum {
+            return when (millis) {
+                15000L -> FIFTEEN_SECONDS
+                30000L -> THIRTY_SECONDS
+                60000L -> ONE_MINUTE
+                300000L -> FIVE_MINUTES
                 else -> FIFTEEN_SECONDS
             }
         }

@@ -61,6 +61,7 @@ fun PreferencesScreenRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             is SettingsEvent.OnSuccessSavePreferences -> onBackClick()
+            else -> Unit
         }
     }
 

@@ -1,18 +1,18 @@
 package id.dev.spendless.settings.presentation.model
 
-enum class SessionExpiredEnum(val minutes: Int) {
-    FIVE_MINUTES(5),
-    FIFTEEN_MINUTES(15),
-    THIRTY_MINUTES(30),
-    ONE_HOUR(60);
+enum class SessionExpiredEnum(val millis: Long) {
+    FIVE_MINUTES(300000),
+    FIFTEEN_MINUTES(900000),
+    THIRTY_MINUTES(1800000),
+    ONE_HOUR(3600000);
 
     companion object {
-        fun fromMinutes(minutes: Int): SessionExpiredEnum {
-            return when (minutes) {
-                5 -> FIVE_MINUTES
-                15 -> FIFTEEN_MINUTES
-                30 -> THIRTY_MINUTES
-                60 -> ONE_HOUR
+        fun fromMinutes(millis: Long): SessionExpiredEnum {
+            return when (millis) {
+                300000L -> FIVE_MINUTES
+                900000L -> FIFTEEN_MINUTES
+                1800000L -> THIRTY_MINUTES
+                3600000L -> ONE_HOUR
                 else -> FIVE_MINUTES
             }
         }

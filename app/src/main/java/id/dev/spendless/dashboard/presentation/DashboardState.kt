@@ -11,6 +11,7 @@ data class DashboardState(
     val previousWeekSpend: String = "0",
     val largestTransactionCategoryAllTime: CategoryWithEmoji = CategoryWithEmoji(),
     val largestTransaction: LargestTransaction = LargestTransaction(),
-    val allTransactions: List<TransactionGroup> = emptyList()
+    val allTransactions: List<TransactionGroup> = emptyList(),
+    val showBottomSheet: Boolean = false
     //
 )

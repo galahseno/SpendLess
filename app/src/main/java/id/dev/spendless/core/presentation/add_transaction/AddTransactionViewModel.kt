@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 
 class AddTransactionViewModel(
     private val coreRepository: CoreRepository,
-    settingPreferences: SettingPreferences
+    private val settingPreferences: SettingPreferences
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddTransactionState())
     val state = _state.asStateFlow()
@@ -232,12 +232,14 @@ class AddTransactionViewModel(
         }
     }
 
-    // TODO Trim traling when save transaction
     private fun handleAddTransaction() {
         viewModelScope.launch {
+            val isSessionExpired = settingPreferences.checkSessionExpired()
+            if (isSessionExpired) return@launch
+
             val transactionData = when (_state.value.selectedTransactionType) {
                 TransactionTypeEnum.Expenses -> AddTransactionModel(
-                    transactionName = _state.value.expenseName,
+                    transactionName = _state.value.expenseName.trimEnd(),
                     categoryEmoji = _state.value.selectedExpenseCategory.categoryEmoji,
                     categoryName = _state.value.selectedExpenseCategory.categoryName,
                     amount = _state.value.expenseAmount
@@ -248,7 +250,7 @@ class AddTransactionViewModel(
                 )
 
                 TransactionTypeEnum.Income -> AddTransactionModel(
-                    transactionName = _state.value.incomeName,
+                    transactionName = _state.value.incomeName.trimEnd(),
                     categoryEmoji = TransactionCategoryEnum.Income.categoryEmoji,
                     categoryName = TransactionCategoryEnum.Income.categoryName,
                     amount = _state.value.incomeAmount.replace(",", ".").toDouble(),

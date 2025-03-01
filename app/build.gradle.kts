@@ -72,6 +72,9 @@ dependencies {
     implementation (libs.androidx.security.crypto)
     implementation (libs.android.database.sqlcipher)
 
+    implementation(libs.androidx.lifecycle.process)
+    implementation(libs.androidx.biometric)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

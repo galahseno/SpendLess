@@ -3,8 +3,8 @@ package id.dev.spendless.dashboard.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.Transaction
 import id.dev.spendless.core.domain.model.LargestTransaction
+import id.dev.spendless.core.domain.model.Transaction
 import id.dev.spendless.core.domain.model.TransactionGroup
 import id.dev.spendless.core.presentation.ui.formatDateForHeader
 import id.dev.spendless.core.presentation.ui.formatTotalSpend
@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -30,7 +31,7 @@ import java.util.Locale
 
 class DashboardViewModel(
     dashboardRepository: DashboardRepository,
-    settingPreferences: SettingPreferences
+    private val settingPreferences: SettingPreferences
 ) : ViewModel() {
     private val _state = MutableStateFlow(DashboardState())
     val state = _state.asStateFlow()
@@ -118,7 +119,6 @@ class DashboardViewModel(
                     }
                 }
             }.launchIn(viewModelScope)
-
     }
 
     fun onAction(action: DashboardAction) {
@@ -141,7 +141,24 @@ class DashboardViewModel(
                 }
             }
 
-            else -> Unit
+            is DashboardAction.OnFABClick -> {
+                viewModelScope.launch {
+                    val isSessionValid = settingPreferences.checkSessionExpired()
+                    if (isSessionValid) return@launch
+
+                    _state.update { it.copy(showBottomSheet = true) }
+                }
+            }
+
+            is DashboardAction.OnShowAllClick, DashboardAction.OnSettingClick -> {
+                viewModelScope.launch {
+                    settingPreferences.checkSessionExpired()
+                }
+            }
+
+            is DashboardAction.OnCloseBottomSheet -> {
+                _state.update { it.copy(showBottomSheet = false) }
+            }
         }
     }
 }

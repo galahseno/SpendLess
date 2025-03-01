@@ -125,7 +125,7 @@ private fun OnboardingPreferencesScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = stringResource(R.string.set_spendless_preferences),
                 style = MaterialTheme.typography.headlineMedium

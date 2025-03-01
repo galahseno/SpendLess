@@ -1,15 +1,18 @@
 package id.dev.spendless.core.data.pref
 
+import android.os.SystemClock
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.model.UserSecurity
 import id.dev.spendless.core.domain.model.UserSession
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class SettingPreferencesImpl(
@@ -26,10 +29,10 @@ class SettingPreferencesImpl(
         return dataStore.data.map {
             UserSession(
                 username = it[USER_NAME_KEY] ?: "",
-                expensesFormat = it[EXPENSES_FORMAT_KEY] ?: "",
-                currencySymbol = it[CURRENCY_KEY] ?: "",
-                decimalSeparator = it[DECIMAL_SEPARATOR_KEY] ?: "",
-                thousandSeparator = it[THOUSAND_SEPARATOR_KEY] ?: "",
+                expensesFormat = it[EXPENSES_FORMAT_KEY] ?: "MinusPrefix",
+                currencySymbol = it[CURRENCY_KEY] ?: "USD",
+                decimalSeparator = it[DECIMAL_SEPARATOR_KEY] ?: "Dot",
+                thousandSeparator = it[THOUSAND_SEPARATOR_KEY] ?: "Comma",
             )
         }
     }
@@ -38,8 +41,8 @@ class SettingPreferencesImpl(
         return dataStore.data.map {
             UserSecurity(
                 biometricPromptEnable = it[BIOMETRICS_KEY] ?: false,
-                sessionExpiryDuration = it[SESSION_EXPIRED_KEY] ?: 5,
-                lockedOutDuration = it[LOCKED_DURATION_KEY] ?: 15
+                sessionExpiryDuration = it[SESSION_EXPIRED_DURATION_KEY] ?: 300000,
+                lockedOutDuration = it[LOCKED_DURATION_KEY] ?: 15000
             )
         }
     }
@@ -88,13 +91,63 @@ class SettingPreferencesImpl(
 
     override suspend fun updateUserSecurity(
         biometricPromptEnable: Boolean,
-        sessionExpiryDuration: Int,
-        lockedOutDuration: Int
+        sessionExpiryDuration: Long,
+        lockedOutDuration: Long
     ) {
         dataStore.edit { preferences ->
             preferences[BIOMETRICS_KEY] = biometricPromptEnable
-            preferences[SESSION_EXPIRED_KEY] = sessionExpiryDuration
+            preferences[SESSION_EXPIRED_DURATION_KEY] = sessionExpiryDuration
             preferences[LOCKED_DURATION_KEY] = lockedOutDuration
+        }
+    }
+
+    override suspend fun logout() {
+        dataStore.edit {
+            it.clear()
+        }
+    }
+
+    override fun getSessionExpired(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[USER_ID_KEY]?.let { userId ->
+                if (userId != -1) {
+                    preferences[SESSION_EXPIRED_KEY] ?: false
+                } else {
+                    false
+                }
+            } ?: false
+        }
+    }
+
+    override suspend fun updateLatestTimeStamp() {
+        dataStore.edit {
+            it[LATEST_TIMESTAMP_KEY] = SystemClock.elapsedRealtime()
+        }
+    }
+
+    override suspend fun checkSessionExpired(): Boolean {
+        val latestTimestamp = dataStore.data.map {
+            it[LATEST_TIMESTAMP_KEY] ?: 0
+        }.first()
+
+        val timeStamp = SystemClock.elapsedRealtime()
+
+        val sessionExpiryDuration = dataStore.data.map {
+            it[SESSION_EXPIRED_DURATION_KEY] ?: 300000
+        }.first()
+
+        val isSessionExpired = timeStamp < latestTimestamp ||
+                timeStamp > latestTimestamp.plus(sessionExpiryDuration)
+
+        dataStore.edit {
+            it[SESSION_EXPIRED_KEY] = isSessionExpired
+        }
+        return isSessionExpired
+    }
+
+    override suspend fun changeSession(value: Boolean) {
+        dataStore.edit {
+            it[SESSION_EXPIRED_KEY] = value
         }
     }
 
@@ -107,7 +160,10 @@ class SettingPreferencesImpl(
         val THOUSAND_SEPARATOR_KEY = stringPreferencesKey("thousand_separator")
 
         val BIOMETRICS_KEY = booleanPreferencesKey("biometrics")
-        val SESSION_EXPIRED_KEY = intPreferencesKey("session_expired")
-        val LOCKED_DURATION_KEY = intPreferencesKey("locked_duration")
+        val SESSION_EXPIRED_DURATION_KEY = longPreferencesKey("session_expired_duration")
+        val LOCKED_DURATION_KEY = longPreferencesKey("locked_duration")
+
+        val LATEST_TIMESTAMP_KEY = longPreferencesKey("latest_timestamp")
+        val SESSION_EXPIRED_KEY = booleanPreferencesKey("session_expired")
     }
 }

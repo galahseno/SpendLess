@@ -8,4 +8,9 @@ interface CoreRepository {
     suspend fun createTransaction(
         addTransactionModel: AddTransactionModel
     ): Result<Unit, DataError.Local>
+
+    suspend fun checkSessionPin(
+        userId: Int,
+        pin: String
+    ): Result<Boolean, DataError.Local>
 }

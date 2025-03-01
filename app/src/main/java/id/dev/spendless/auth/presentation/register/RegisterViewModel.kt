@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.auth.domain.AuthRepository
+import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
+    private val settingPreferences: SettingPreferences,
     private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(RegisterState())
@@ -276,6 +278,7 @@ class RegisterViewModel(
 
                 is Result.Success -> {
                     _event.send(RegisterEvent.OnRegisterSuccess)
+                    settingPreferences.updateLatestTimeStamp()
                 }
             }
         }

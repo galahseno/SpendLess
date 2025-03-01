@@ -82,14 +82,12 @@ class SettingsViewModel(
 
     fun onAction(action: SettingsAction) {
         when (action) {
+            is SettingsAction.OnLogoutClick -> handleLogoutClick()
+
             is SettingsAction.OnExpensesFormatSelected -> handleSelectedExpensesFormat(action.expense)
             is SettingsAction.OnCurrencySelected -> handleSelectedCurrency(action.currency)
             is SettingsAction.OnDecimalSeparatorSelected -> handleSelectedDecimalSeparator(action.separator)
             is SettingsAction.OnThousandSeparatorSelected -> handleSelectedThousandSeparator(action.separator)
-            is SettingsAction.OnLogoutClick -> {
-
-            }
-
             is SettingsAction.OnSavePreferences -> handleSavePreferences()
 
             is SettingsAction.OnBiometricStatusChanged -> handleBiometricStatusChanged(action.status)
@@ -100,6 +98,15 @@ class SettingsViewModel(
             is SettingsAction.OnLockedOutDurationChanged -> handleLockedOutDurationChanged(action.duration)
             is SettingsAction.OnSaveSecurity -> handleSaveSecurity()
             else -> Unit
+        }
+    }
+
+    private fun handleLogoutClick() {
+        // TODO save user preferences to db to persist latest preferences
+        viewModelScope.launch {
+            settingPreferences.logout()
+            joinAll()
+            _event.send(SettingsEvent.OnSuccessLogout)
         }
     }
 
@@ -185,6 +192,9 @@ class SettingsViewModel(
 
     private fun handleSavePreferences() {
         viewModelScope.launch {
+            val isSessionExpired = settingPreferences.checkSessionExpired()
+            if (isSessionExpired) return@launch
+
             try {
                 settingPreferences.updateUserSession(
                     expensesFormat = _state.value.selectedExpenseFormat.name,
@@ -223,11 +233,14 @@ class SettingsViewModel(
 
     private fun handleSaveSecurity() {
         viewModelScope.launch {
+            val isSessionExpired = settingPreferences.checkSessionExpired()
+            if (isSessionExpired) return@launch
+
             try {
                 settingPreferences.updateUserSecurity(
                     biometricPromptEnable = _state.value.biometricsEnabled,
-                    sessionExpiryDuration = _state.value.sessionExpiryDuration.minutes,
-                    lockedOutDuration = _state.value.lockedOutDuration.seconds
+                    sessionExpiryDuration = _state.value.sessionExpiryDuration.millis,
+                    lockedOutDuration = _state.value.lockedOutDuration.millis
                 )
 
                 joinAll()

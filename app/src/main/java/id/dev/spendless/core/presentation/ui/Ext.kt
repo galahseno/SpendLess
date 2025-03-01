@@ -10,6 +10,7 @@ import java.text.DecimalFormatSymbols
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 fun String.formatTotalSpend(
     expensesFormat: ExpensesFormatEnum,
@@ -73,4 +74,11 @@ fun LocalDate.formatDateForHeader(): String {
             this.format(formatter)
         }
     }
+}
+
+fun Long.formatTryAgainPinDuration(): String {
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(this)
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(this) % 60
+
+    return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }

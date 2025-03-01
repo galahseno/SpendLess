@@ -20,7 +20,7 @@ enum class DayOfWeekEnum(val dayOfWeek: DayOfWeek) {
     }
 }
 
-// TODO ovveride toString
+// TODO ovveride toString and check date for next month and year
 enum class RepeatIntervalEnum(
     val repeatName: String,
     val formattedDate: String = "",

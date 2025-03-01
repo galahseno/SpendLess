@@ -1,5 +1,6 @@
 package id.dev.spendless.settings.presentation.security
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -47,6 +48,7 @@ fun SecurityScreenRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             is SettingsEvent.OnSuccessSavePreferences -> onBackClick()
+            else -> Unit
         }
     }
 
@@ -89,20 +91,22 @@ private fun SecurityScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(
-                text = stringResource(R.string.biometric_for_pin_prompt),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.W500,
-                    fontSize = 14.sp
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                Text(
+                    text = stringResource(R.string.biometric_for_pin_prompt),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.sp
+                    )
                 )
-            )
-            BiometricPromptStatus(
-                status = state.biometricsEnabled,
-                onStatusSelected = {
-                    onAction(SettingsAction.OnBiometricStatusChanged(it))
-                }
-            )
-            Spacer(modifier = Modifier.height(10.dp))
+                BiometricPromptStatus(
+                    status = state.biometricsEnabled,
+                    onStatusSelected = {
+                        onAction(SettingsAction.OnBiometricStatusChanged(it))
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
             Text(
                 text = stringResource(R.string.session_expiry_duration),
                 style = MaterialTheme.typography.titleMedium.copy(

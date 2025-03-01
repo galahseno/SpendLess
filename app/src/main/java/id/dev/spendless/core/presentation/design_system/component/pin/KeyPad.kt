@@ -34,6 +34,7 @@ fun KeyPad(
     onBiometricClick: () -> Unit,
     modifier: Modifier = Modifier,
     isBiometricEnabled: Boolean = false,
+    keyPadEnable: Boolean = true,
     padBackground: Color = keyPadBackground
 ) {
     val numberPadLayout = remember {
@@ -60,18 +61,21 @@ fun KeyPad(
                         "" -> BiometricButton(
                             isBiometricEnabled = isBiometricEnabled,
                             onBiometricClick = onBiometricClick,
-                            keyPadBackground = padBackground
+                            keyPadBackground = padBackground,
+                            keyPadEnable = keyPadEnable
                         )
 
                         "delete" -> DeleteButton(
                             onDeletePadClick = onDeletePadClick,
-                            keyPadBackground = padBackground
+                            keyPadBackground = padBackground,
+                            keyPadEnable = keyPadEnable
                         )
 
                         else -> NumberButton(
                             number = number,
                             onNumberPadClick = onNumberPadClick,
-                            keyPadBackground = padBackground
+                            keyPadBackground = padBackground,
+                            keyPadEnable = keyPadEnable
                         )
                     }
                 }
@@ -84,9 +88,11 @@ fun KeyPad(
 private fun NumberButton(
     number: String,
     onNumberPadClick: (String) -> Unit,
-    keyPadBackground: Color
+    keyPadBackground: Color,
+    keyPadEnable: Boolean = true,
 ) {
     KeyPadButton(
+        enabled = keyPadEnable,
         onClick = { onNumberPadClick(number) },
         containerColor = keyPadBackground,
         content = {
@@ -101,9 +107,11 @@ private fun NumberButton(
 @Composable
 private fun DeleteButton(
     onDeletePadClick: () -> Unit,
-    keyPadBackground: Color
+    keyPadBackground: Color,
+    keyPadEnable: Boolean = true,
 ) {
     KeyPadButton(
+        enabled = keyPadEnable,
         onClick = onDeletePadClick,
         containerColor = keyPadBackground.copy(alpha = 0.3f),
         content = {
@@ -120,10 +128,11 @@ private fun DeleteButton(
 private fun BiometricButton(
     isBiometricEnabled: Boolean,
     onBiometricClick: () -> Unit,
-    keyPadBackground: Color
+    keyPadBackground: Color,
+    keyPadEnable: Boolean = true
 ) {
     KeyPadButton(
-        enabled = isBiometricEnabled,
+        enabled = isBiometricEnabled && keyPadEnable,
         onClick = { if (isBiometricEnabled) onBiometricClick() },
         containerColor = if (isBiometricEnabled) keyPadBackground.copy(alpha = 0.3f)
         else Color.Transparent,
@@ -155,7 +164,7 @@ private fun KeyPadButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = Color.Black,
-            disabledContainerColor = disabledContainerColor
+            disabledContainerColor = disabledContainerColor,
         ),
         shape = RoundedCornerShape(32.dp),
         modifier = modifier.size(108.dp)
@@ -175,7 +184,7 @@ private fun KeyPadPreview() {
             onNumberPadClick = {},
             onDeletePadClick = {},
             onBiometricClick = {},
-            isBiometricEnabled = true
+            isBiometricEnabled = true,
         )
     }
 }

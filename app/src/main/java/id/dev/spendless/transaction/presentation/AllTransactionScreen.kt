@@ -12,10 +12,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -71,7 +68,6 @@ private fun AllTransactionScreen(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -82,6 +78,7 @@ private fun AllTransactionScreen(
                 },
                 onExportClick = {
                     // TODO Export sheet
+                    // TODO Check session expired
                 },
             )
         },
@@ -90,7 +87,7 @@ private fun AllTransactionScreen(
             SpendLessFab(
                 onClick = {
                     scope.launch {
-                        showBottomSheet = true
+                        onAction(AllTransactionAction.OnFABClick)
                     }
                 }
             )
@@ -121,7 +118,7 @@ private fun AllTransactionScreen(
             }
 
             AnimatedVisibility(
-                visible = showBottomSheet
+                visible = state.showBottomSheet
             ) {
                 AddTransactionScreenRoot(
                     sheetState = sheetState,
@@ -130,7 +127,7 @@ private fun AllTransactionScreen(
                             sheetState.hide()
                         }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
-                                showBottomSheet = false
+                               onAction(AllTransactionAction.OnCloseBottomSheet)
                             }
                         }
                     }

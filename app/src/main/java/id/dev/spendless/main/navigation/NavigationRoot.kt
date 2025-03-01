@@ -1,7 +1,9 @@
 package id.dev.spendless.main.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -19,6 +21,7 @@ import id.dev.spendless.auth.presentation.register.onboarding_preferences.Onboar
 import id.dev.spendless.auth.presentation.register.repeat_pin.RepeatPinScreenRoot
 import id.dev.spendless.core.presentation.pin_prompt.PinPromptScreenRoot
 import id.dev.spendless.dashboard.presentation.DashboardScreenRoot
+import id.dev.spendless.main.util.BiometricPromptManager
 import id.dev.spendless.settings.presentation.SettingScreenRoot
 import id.dev.spendless.settings.presentation.preferences.PreferencesScreenRoot
 import id.dev.spendless.settings.presentation.security.SecurityScreenRoot
@@ -26,18 +29,39 @@ import id.dev.spendless.transaction.presentation.AllTransactionScreenRoot
 import id.dev.spendless.transaction.presentation.export.ExportScreenRoot
 import org.koin.androidx.compose.navigation.koinNavViewModel
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun NavigationRoot(
     navController: NavHostController,
+    promptManager: BiometricPromptManager,
     isLoggedIn: Boolean,
+    isSessionExpired: Boolean,
+    savedBackStack: List<String>,
+    onSaveBackStack: (List<String>) -> Unit,
 ) {
+    LaunchedEffect(isSessionExpired) {
+        // TODO Handle save and restore state
+        if (isSessionExpired) {
+            val currentBackStack =
+                navController.currentBackStack.value.map { it.destination.route ?: "" }
+            onSaveBackStack(currentBackStack)
+
+            navController.navigate(Screen.Session) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                    saveState = true
+                }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = if (isLoggedIn) Screen.Home else Screen.Auth,
         modifier = Modifier.fillMaxSize()
     ) {
         authGraph(navController)
-        sessionGraph(navController)
+        sessionGraph(navController, savedBackStack, promptManager)
         homeGraph(navController)
         transactionGraph(navController)
         settingsGraph(navController)
@@ -184,13 +208,47 @@ private fun NavGraphBuilder.homeGraph(navController: NavHostController) {
     }
 }
 
-private fun NavGraphBuilder.sessionGraph(navController: NavHostController) {
+private fun NavGraphBuilder.sessionGraph(
+    navController: NavHostController,
+    savedBackStack: List<String>,
+    promptManager: BiometricPromptManager
+) {
     navigation<Screen.Session>(
         startDestination = Screen.Session.PinPrompt
     ) {
         composable<Screen.Session.PinPrompt> {
             PinPromptScreenRoot(
+                onSuccessLogout = {
+                    navController.navigate(Screen.Auth) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onSuccessValidateSession = {
+                    if (savedBackStack.isNotEmpty()) {
+                        val filteredBackStack = savedBackStack.filter { route ->
+                            route != "" && route != navController.graph.startDestinationRoute
+                        }
 
+                        filteredBackStack.forEach { route ->
+                            navController.navigate(route) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(Screen.Session) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    } else {
+                        navController.navigate(Screen.Home.Dashboard) {
+                            popUpTo(Screen.Session) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                },
+                promptManager = promptManager
             )
         }
     }
@@ -229,6 +287,13 @@ private fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
                 },
                 onSecurityClick = {
                     navController.navigate(Screen.Settings.SettingsMenu.Security)
+                },
+                onSuccessLogout = {
+                    navController.navigate(Screen.Auth) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
