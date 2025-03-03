@@ -49,7 +49,6 @@ fun SettingScreenRoot(
     onBackClick: () -> Unit,
     onPreferencesClick: () -> Unit,
     onSecurityClick: () -> Unit,
-    onSuccessLogout: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -61,10 +60,7 @@ fun SettingScreenRoot(
     }
 
     ObserveAsEvents(viewModel.event) { event ->
-        when (event) {
-            is SettingsEvent.OnSuccessLogout -> onSuccessLogout()
-            else -> Unit
-        }
+
     }
 
     SettingScreen(

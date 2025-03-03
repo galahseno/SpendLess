@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.R
-import id.dev.spendless.core.domain.model.TransactionGroup
+import id.dev.spendless.core.domain.model.transaction.TransactionGroup
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.component.transaction.TransactionLazyList

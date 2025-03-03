@@ -9,7 +9,10 @@ import id.dev.spendless.core.data.CoreRepositoryImpl
 import id.dev.spendless.core.data.database.SpendLessDb
 import id.dev.spendless.core.data.database.SpendLessDbPassphrase
 import id.dev.spendless.core.data.pref.SettingPreferencesImpl
+import id.dev.spendless.core.data.security.AesEncryptionService
+import id.dev.spendless.core.data.security.KeyManager
 import id.dev.spendless.core.domain.CoreRepository
+import id.dev.spendless.core.domain.EncryptionService
 import id.dev.spendless.core.domain.SettingPreferences
 import net.sqlcipher.database.SupportFactory
 import org.koin.android.ext.koin.androidApplication
@@ -43,4 +46,11 @@ val coreDataModule = module {
     }
     single { get<SpendLessDb>().transactionDao() }
     single { get<SpendLessDb>().userDao() }
+    single { get<SpendLessDb>().preferencesDao() }
+
+    single {
+        val passphrase = get<SpendLessDbPassphrase>().getPassphrase()
+        KeyManager.getOrCreateSecretKey(passphrase)
+    }
+    singleOf(::AesEncryptionService).bind<EncryptionService>()
 }

@@ -1,6 +1,5 @@
 package id.dev.spendless.settings.presentation.model
 
-// TODO impl
 enum class LockedOutEnum(val millis: Long) {
     FIFTEEN_SECONDS(15000),
     THIRTY_SECONDS(30000),

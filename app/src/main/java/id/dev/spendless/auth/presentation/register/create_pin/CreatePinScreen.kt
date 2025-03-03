@@ -1,5 +1,6 @@
 package id.dev.spendless.auth.presentation.register.create_pin
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -67,11 +68,19 @@ fun CreatePinScreenRoot(
         }
     }
 
+    BackHandler {
+        viewModel.onAction(RegisterAction.OnResetPin)
+        onBackClick()
+    }
+
     CreatePinScreen(
         state = state,
         onAction = { action ->
             when (action) {
-                is RegisterAction.OnBackClick -> onBackClick()
+                is RegisterAction.OnBackClick -> {
+                    viewModel.onAction(RegisterAction.OnResetPin)
+                    onBackClick()
+                }
                 else -> Unit
             }
             viewModel.onAction(action)

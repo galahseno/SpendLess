@@ -1,4 +1,4 @@
-package id.dev.spendless.core.domain.model
+package id.dev.spendless.core.domain.model.transaction
 
 data class AddTransactionModel(
     val transactionName: String,

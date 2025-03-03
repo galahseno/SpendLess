@@ -11,12 +11,12 @@ interface UserDao {
     @Query("Select Exists(Select * From user Where username = :username)")
     suspend fun isUserExist(username: String): Boolean
 
-    @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :userId AND pin = :pin)")
-    suspend fun checkSessionPin(userId: Int, pin: String): Boolean
+    @Query("SELECT * FROM user WHERE id = :userId")
+    suspend fun getUserById(userId: Int): UserEntity?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun createUser(user: UserEntity): Long
 
-    @Query("Select * From user Where username = :username And pin = :pin")
-    suspend fun loginAccount(username: String, pin: String): UserEntity?
+    @Query("Select * From user Where username = :username")
+    suspend fun loginAccount(username: String): UserEntity?
 }

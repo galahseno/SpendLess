@@ -1,62 +1,53 @@
 package id.dev.spendless.core.presentation.ui.transaction.repeat_interval
 
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
-enum class DayOfWeekEnum(val dayOfWeek: DayOfWeek) {
-    MONDAY(DayOfWeek.MONDAY),
-    TUESDAY(DayOfWeek.TUESDAY),
-    WEDNESDAY(DayOfWeek.WEDNESDAY),
-    THURSDAY(DayOfWeek.THURSDAY),
-    FRIDAY(DayOfWeek.FRIDAY),
-    SATURDAY(DayOfWeek.SATURDAY),
-    SUNDAY(DayOfWeek.SUNDAY);
+enum class RepeatIntervalEnum {
+    DoesNotRepeat,
+    Daily,
+    Weekly,
+    Monthly,
+    Yearly;
 
-    companion object {
-        fun fromDayOfWeek(dayOfWeek: DayOfWeek): DayOfWeekEnum? {
-            return entries.find { it.dayOfWeek == dayOfWeek }
+    override fun toString(): String {
+        val now = LocalDate.now()
+        return when (this) {
+            DoesNotRepeat -> "Does not repeat"
+            Daily -> "Daily"
+            Weekly -> "Weekly on ${
+                now.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            }"
+
+            Monthly -> "Monthly on the ${
+                getValidDayOfMonth(
+                    now.dayOfMonth,
+                    now.monthValue
+                )
+            }${getDayOfMonthSuffix(getValidDayOfMonth(now.dayOfMonth, now.monthValue))}"
+
+            Yearly -> "Yearly on ${now.format(DateTimeFormatter.ofPattern("MMM"))} ${
+                getValidDayOfMonth(
+                    now.dayOfMonth,
+                    now.monthValue
+                )
+            }${getDayOfMonthSuffix(getValidDayOfMonth(now.dayOfMonth, now.monthValue))}"
         }
     }
-}
 
-// TODO ovveride toString and check date for next month and year
-enum class RepeatIntervalEnum(
-    val repeatName: String,
-    val formattedDate: String = "",
-) {
-    DoesNotRepeat("Does not repeat"),
-    Daily("Daily"),
-    Weekly(
-        "Weekly",
-        formattedDate = "on ${
-            DayOfWeekEnum.fromDayOfWeek(LocalDate.now().dayOfWeek)?.name?.lowercase()
-                ?.replaceFirstChar { it.uppercase() } ?: "Monday"
-        }"),
+    private fun getValidDayOfMonth(day: Int, month: Int): Int {
+        val lastDayOfMonth = LocalDate.of(LocalDate.now().year, month, 1).lengthOfMonth()
+        return if (day > lastDayOfMonth) lastDayOfMonth else day
+    }
 
-    Monthly(
-        "Monthly",
-        formattedDate = "on the ${LocalDate.now().dayOfMonth} ${getDayOfMonthSuffix(LocalDate.now().dayOfMonth)}"
-    ),
-    Yearly(
-        "Yearly",
-        formattedDate = "on the ${
-            LocalDate.of(
-                LocalDate.now().year,
-                LocalDate.now().monthValue,
-                LocalDate.now().dayOfMonth
-            ).format(
-                DateTimeFormatter.ofPattern("MMM dd")
-            )
-        }"
-    )
-}
-
-fun getDayOfMonthSuffix(day: Int): String {
-    return when (day) {
-        1, 21, 31 -> "st"
-        2, 22 -> "nd"
-        3, 23 -> "rd"
-        else -> "th"
+    private fun getDayOfMonthSuffix(day: Int): String {
+        return when (day) {
+            1, 21, 31 -> "st"
+            2, 22 -> "nd"
+            3, 23 -> "rd"
+            else -> "th"
+        }
     }
 }

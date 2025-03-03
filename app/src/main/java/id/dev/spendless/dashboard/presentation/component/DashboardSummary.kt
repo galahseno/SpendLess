@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.R
-import id.dev.spendless.core.domain.model.CategoryWithEmoji
-import id.dev.spendless.core.domain.model.LargestTransaction
+import id.dev.spendless.core.domain.model.transaction.CategoryWithEmoji
+import id.dev.spendless.core.domain.model.transaction.LargestTransaction
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.balanceDashboardColor
 import id.dev.spendless.core.presentation.design_system.componentBackground
@@ -65,7 +65,6 @@ fun DashboardSummary(
             ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // TODO check spacing when no largest transactionCategory
             Spacer(modifier = Modifier.height(48.dp))
             Text(
                 text = balance,

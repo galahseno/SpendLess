@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.AddTransactionModel
+import id.dev.spendless.core.domain.model.transaction.AddTransactionModel
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
@@ -244,9 +244,9 @@ class AddTransactionViewModel(
                     categoryName = _state.value.selectedExpenseCategory.categoryName,
                     amount = _state.value.expenseAmount
                         .replace(",", ".").toDouble().unaryMinus(),
-                    note = _state.value.expensesNote,
+                    note = _state.value.expensesNote.trim(),
                     createdAt = System.currentTimeMillis(),
-                    repeat = _state.value.selectedExpenseRepeatInterval.repeatName
+                    repeat = _state.value.selectedExpenseRepeatInterval.toString()
                 )
 
                 TransactionTypeEnum.Income -> AddTransactionModel(
@@ -254,9 +254,9 @@ class AddTransactionViewModel(
                     categoryEmoji = TransactionCategoryEnum.Income.categoryEmoji,
                     categoryName = TransactionCategoryEnum.Income.categoryName,
                     amount = _state.value.incomeAmount.replace(",", ".").toDouble(),
-                    note = _state.value.incomeNote,
+                    note = _state.value.incomeNote.trim(),
                     createdAt = System.currentTimeMillis(),
-                    repeat = _state.value.selectedIncomeRepeatInterval.repeatName
+                    repeat = _state.value.selectedIncomeRepeatInterval.toString()
                 )
             }
             val result = coreRepository.createTransaction(transactionData)

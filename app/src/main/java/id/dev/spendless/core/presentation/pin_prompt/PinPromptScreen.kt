@@ -66,7 +66,6 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PinPromptScreenRoot(
-    onSuccessLogout: () -> Unit,
     onSuccessValidateSession: () -> Unit,
     promptManager: BiometricPromptManager,
     viewModel: PinPromptViewModel = koinViewModel()
@@ -125,7 +124,6 @@ fun PinPromptScreenRoot(
 
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
-            is PinPromptEvent.OnSuccessLogout -> onSuccessLogout()
             is PinPromptEvent.OnSuccessValidateSession -> onSuccessValidateSession()
         }
     }
@@ -187,7 +185,7 @@ private fun PinPromptScreen(
             Text(
                 text = if (state.maxFailedAttempt) stringResource(
                     R.string.try_your_pin_again_in,
-                    state.tryAgainDuration.formatTryAgainPinDuration()
+                    state.lockedOutDuration.formatTryAgainPinDuration()
                 )
                 else stringResource(R.string.enter_pin_again),
                 style = MaterialTheme.typography.titleMedium

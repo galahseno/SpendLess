@@ -13,8 +13,15 @@ data class TransactionEntity(
     val transactionName: String,
     val categoryEmoji: String,
     val categoryName: String,
-    val amount: Double,
+    val amount: String,
     val note: String = "",
     val createdAt: Long,
-    val repeat: String
+    val repeat: String,
+
+    val transactionNameIv: String,
+    val categoryEmojiIv: String,
+    val categoryNameIv: String,
+    val amountIv: String,
+    val noteIv: String,
+    val repeatIv: String,
 )

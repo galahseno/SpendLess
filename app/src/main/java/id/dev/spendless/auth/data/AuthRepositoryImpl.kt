@@ -1,18 +1,22 @@
 package id.dev.spendless.auth.data
 
+import android.util.Log
 import id.dev.spendless.auth.domain.AuthRepository
+import id.dev.spendless.core.data.database.dao.PreferencesDao
 import id.dev.spendless.core.data.database.dao.UserDao
 import id.dev.spendless.core.data.database.entity.UserEntity
+import id.dev.spendless.core.domain.EncryptionService
 import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.joinAll
 import kotlin.coroutines.coroutineContext
 
 class AuthRepositoryImpl(
     private val settingPreferences: SettingPreferences,
     private val userDao: UserDao,
+    private val preferencesDao: PreferencesDao,
+    private val encryptionService: EncryptionService,
 ) : AuthRepository {
     override suspend fun checkUsernameExists(username: String): Result<Unit, DataError.Local> {
         try {
@@ -28,7 +32,6 @@ class AuthRepositoryImpl(
         }
     }
 
-    // TODO Encrypt PIN
     override suspend fun registerAccount(
         username: String,
         pin: String,
@@ -38,7 +41,9 @@ class AuthRepositoryImpl(
         thousandSeparator: String
     ): Result<Unit, DataError.Local> {
         try {
-            val userEntity = UserEntity(username = username, pin = pin)
+            val (encryptedPin, encryptedIv) = encryptionService.encrypt(pin)
+
+            val userEntity = UserEntity(username = username, pin = encryptedPin, iv = encryptedIv)
             val userId = userDao.createUser(userEntity)
 
             if (userId == -1L) {
@@ -53,12 +58,12 @@ class AuthRepositoryImpl(
                 decimalSeparator = decimalSeparator,
                 thousandSeparator = thousandSeparator
             )
-            joinAll()
 
             return Result.Success(Unit)
 
-        } catch (_: Exception) {
+        } catch (e: Exception) {
             coroutineContext.ensureActive()
+            Log.e("AuthRepositoryImpl", "registerAccount: ${e.message}", e)
             return Result.Error(DataError.Local.ERROR_PROSES)
         }
     }
@@ -74,14 +79,32 @@ class AuthRepositoryImpl(
                 return Result.Error(DataError.Local.USER_NOT_EXIST)
             }
 
-            val userEntity = userDao.loginAccount(username, pin)
+            val user = userDao.loginAccount(username)
                 ?: return Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
 
+            if (encryptionService.decrypt(user.pin, user.iv) != pin) {
+                return Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
+            }
+
+            preferencesDao.getPreferences(user.id)?.let {
+                settingPreferences.updateUserSecurity(
+                    biometricPromptEnable = it.biometricPromptEnable,
+                    sessionExpiryDuration = it.sessionExpiryDuration,
+                    lockedOutDuration = it.lockedOutDuration
+                )
+
+                settingPreferences.updateUserSession(
+                    expensesFormat = it.expensesFormat,
+                    currencySymbol = it.currencySymbol,
+                    decimalSeparator = it.decimalSeparator,
+                    thousandSeparator = it.thousandSeparator
+                )
+            }
+
             settingPreferences.saveLoginSession(
-                userId = userEntity.id,
-                username = userEntity.username,
+                userId = user.id,
+                username = user.username,
             )
-            joinAll()
 
             return Result.Success(Unit)
 

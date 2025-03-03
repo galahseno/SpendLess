@@ -9,12 +9,14 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.model.PinPromptAttempt
 import id.dev.spendless.core.domain.model.UserSecurity
 import id.dev.spendless.core.domain.model.UserSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
+// TODO encrypt data store
 class SettingPreferencesImpl(
     private val dataStore: DataStore<Preferences>
 ) : SettingPreferences {
@@ -42,7 +44,7 @@ class SettingPreferencesImpl(
             UserSecurity(
                 biometricPromptEnable = it[BIOMETRICS_KEY] ?: false,
                 sessionExpiryDuration = it[SESSION_EXPIRED_DURATION_KEY] ?: 300000,
-                lockedOutDuration = it[LOCKED_DURATION_KEY] ?: 15000
+                lockedOutDuration = it[LOCKED_DURATION_KEY] ?: 30000
             )
         }
     }
@@ -63,6 +65,7 @@ class SettingPreferencesImpl(
             preferences[DECIMAL_SEPARATOR_KEY] = decimalSeparator
             preferences[THOUSAND_SEPARATOR_KEY] = thousandSeparator
         }
+        updateLatestTimeStamp()
     }
 
     override suspend fun saveLoginSession(
@@ -73,6 +76,7 @@ class SettingPreferencesImpl(
             preferences[USER_ID_KEY] = userId
             preferences[USER_NAME_KEY] = username
         }
+        updateLatestTimeStamp()
     }
 
     override suspend fun updateUserSession(
@@ -98,6 +102,7 @@ class SettingPreferencesImpl(
             preferences[BIOMETRICS_KEY] = biometricPromptEnable
             preferences[SESSION_EXPIRED_DURATION_KEY] = sessionExpiryDuration
             preferences[LOCKED_DURATION_KEY] = lockedOutDuration
+            preferences[LATEST_DURATION_KEY] = lockedOutDuration
         }
     }
 
@@ -151,6 +156,42 @@ class SettingPreferencesImpl(
         }
     }
 
+    override fun getPinPromptAttempt(): Flow<PinPromptAttempt> {
+        return dataStore.data.map {
+            PinPromptAttempt(
+                failedAttempt = it[FAILED_ATTEMPT_PIN_PROMPT_KEY] ?: 0,
+                maxFailedAttempt = it[MAX_ATTEMPT_PIN_PROMPT_KEY] ?: false,
+                lockedOutDuration = it[LATEST_DURATION_KEY] ?: 30000
+            )
+        }
+    }
+
+    override suspend fun resetPinPromptAttempt(value: PinPromptAttempt) {
+        dataStore.edit {
+            it[FAILED_ATTEMPT_PIN_PROMPT_KEY] = value.failedAttempt
+            it[MAX_ATTEMPT_PIN_PROMPT_KEY] = value.maxFailedAttempt
+            it[LATEST_DURATION_KEY] = value.lockedOutDuration
+        }
+    }
+
+    override suspend fun updateFailedAttempt(value: Int) {
+        dataStore.edit {
+            it[FAILED_ATTEMPT_PIN_PROMPT_KEY] = value
+        }
+    }
+
+    override suspend fun updateMaxAttemptPinPrompt(value: Boolean) {
+        dataStore.edit {
+            it[MAX_ATTEMPT_PIN_PROMPT_KEY] = value
+        }
+    }
+
+    override suspend fun updateLatestDuration(value: Long) {
+        dataStore.edit {
+            it[LATEST_DURATION_KEY] = value
+        }
+    }
+
     private companion object {
         val USER_ID_KEY = intPreferencesKey("user_id")
         val USER_NAME_KEY = stringPreferencesKey("user_name")
@@ -165,5 +206,8 @@ class SettingPreferencesImpl(
 
         val LATEST_TIMESTAMP_KEY = longPreferencesKey("latest_timestamp")
         val SESSION_EXPIRED_KEY = booleanPreferencesKey("session_expired")
+        val FAILED_ATTEMPT_PIN_PROMPT_KEY = intPreferencesKey("attempt_pin_prompt")
+        val MAX_ATTEMPT_PIN_PROMPT_KEY = booleanPreferencesKey("max_pin_prompt_failed")
+        val LATEST_DURATION_KEY = longPreferencesKey("latest_duration")
     }
 }

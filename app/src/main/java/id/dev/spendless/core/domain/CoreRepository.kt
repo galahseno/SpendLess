@@ -1,6 +1,6 @@
 package id.dev.spendless.core.domain
 
-import id.dev.spendless.core.domain.model.AddTransactionModel
+import id.dev.spendless.core.domain.model.transaction.AddTransactionModel
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
 
@@ -13,4 +13,6 @@ interface CoreRepository {
         userId: Int,
         pin: String
     ): Result<Boolean, DataError.Local>
+
+    suspend fun logout(): Result<Unit, DataError.Local>
 }

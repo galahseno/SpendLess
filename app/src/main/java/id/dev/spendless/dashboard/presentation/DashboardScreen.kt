@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import id.dev.spendless.core.domain.model.LargestTransaction
+import id.dev.spendless.core.domain.model.transaction.LargestTransaction
 import id.dev.spendless.core.presentation.add_transaction.AddTransactionScreenRoot
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.component.SpendLessFab
@@ -136,7 +136,7 @@ private fun DashboardScreen(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(screenBackground)
             ) {
-                if (state.allTransactions.isNotEmpty()) {
+                if (state.latestTransactions.isNotEmpty()) {
                     LatestTransaction(
                         onShowAllClick = {
                             onAction(DashboardAction.OnShowAllClick)
@@ -144,7 +144,7 @@ private fun DashboardScreen(
                         onItemClick = {
                             onAction(DashboardAction.OnItemTransactionClick(it))
                         },
-                        allTransactions = state.allTransactions,
+                        allTransactions = state.latestTransactions,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = 16.dp, start = 16.dp, end = 10.dp),

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.core.domain.SettingPreferences
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -43,7 +44,8 @@ class MainViewModel(
 
     fun resetSession() {
         viewModelScope.launch {
-            settingPreferences.changeSession(true)
+            if (settingPreferences.getUserId().first() != -1)
+                settingPreferences.changeSession(true)
         }
     }
 

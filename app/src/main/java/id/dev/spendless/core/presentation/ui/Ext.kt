@@ -82,3 +82,7 @@ fun Long.formatTryAgainPinDuration(): String {
 
     return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }
+
+fun Double?.formatDoubleDigit() : String {
+    return String.format(Locale.getDefault(), "%.2f", this)
+}

@@ -57,6 +57,7 @@ fun NavigationRoot(
 
     NavHost(
         navController = navController,
+        // TODO check logout with animation transition
         startDestination = if (isLoggedIn) Screen.Home else Screen.Auth,
         modifier = Modifier.fillMaxSize()
     ) {
@@ -93,8 +94,6 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
         composable<Screen.Auth.Register> {
-            // TODO only navigate when user already displayed to prevent bug when navigating to fast
-            // java.lang.IllegalStateException:  You cannot access the NavBackStackEntry's ViewModels after the NavBackStackEntry is destroyed
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val backStackEntry = remember { it }
             val viewModel: RegisterViewModel =
@@ -218,13 +217,6 @@ private fun NavGraphBuilder.sessionGraph(
     ) {
         composable<Screen.Session.PinPrompt> {
             PinPromptScreenRoot(
-                onSuccessLogout = {
-                    navController.navigate(Screen.Auth) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
-                },
                 onSuccessValidateSession = {
                     if (savedBackStack.isNotEmpty()) {
                         val filteredBackStack = savedBackStack.filter { route ->
@@ -288,13 +280,6 @@ private fun NavGraphBuilder.settingsGraph(navController: NavHostController) {
                 onSecurityClick = {
                     navController.navigate(Screen.Settings.SettingsMenu.Security)
                 },
-                onSuccessLogout = {
-                    navController.navigate(Screen.Auth) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
-                }
             )
         }
         composable<Screen.Settings.SettingsMenu.Preferences> {

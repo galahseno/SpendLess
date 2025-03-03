@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.model.PinPromptAttempt
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -18,7 +20,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class PinPromptViewModel(
@@ -36,56 +37,49 @@ class PinPromptViewModel(
             .getUserSession()
             .map { it.username }
             .distinctUntilChanged()
-            .onEach {
-                _state.value = _state.value.copy(username = it)
+            .onEach { username ->
+                if (username.isNotEmpty()) {
+                    _state.update { it.copy(username = username) }
+                }
             }
             .launchIn(viewModelScope)
 
-        settingPreferences
-            .getUserSecurity()
-            .onEach {
-                _state.value = _state.value.copy(
-                    biometricsEnabled = it.biometricPromptEnable
+        combine(
+            settingPreferences.getPinPromptAttempt().distinctUntilChanged(),
+            settingPreferences.getUserSecurity().distinctUntilChanged()
+        ) { pinPromptAttempt, userSecurity ->
+            if (pinPromptAttempt.failedAttempt == 3)
+                settingPreferences.updateMaxAttemptPinPrompt(true)
+
+            _state.update {
+                it.copy(
+                    maxFailedAttempt = pinPromptAttempt.maxFailedAttempt,
+                    biometricsEnabled = userSecurity.biometricPromptEnable,
+                    lockedOutDuration = if (pinPromptAttempt.maxFailedAttempt) pinPromptAttempt.lockedOutDuration
+                    else userSecurity.lockedOutDuration,
                 )
             }
-            .launchIn(viewModelScope)
 
-
-        _state
-            .map { it.failedAttempt }
-            .distinctUntilChanged()
-            .onEach { failedAttempt ->
-                if (failedAttempt == 3) {
+            if (pinPromptAttempt.maxFailedAttempt) {
+                if (_state.value.lockedOutDuration > 0) {
+                    delay(1000)
+                    settingPreferences.updateLatestDuration( _state.value.lockedOutDuration - 1000)
+                } else {
                     _state.update {
                         it.copy(
-                            maxFailedAttempt = true,
-                            failedAttempt = 0
+                            lockedOutDuration = userSecurity.lockedOutDuration
                         )
                     }
-                }
-            }
-            .launchIn(viewModelScope)
-
-        _state
-            .map { it.maxFailedAttempt }
-            .distinctUntilChanged()
-            .onEach { maxAttempt ->
-                if (maxAttempt) {
-                    while (_state.value.tryAgainDuration > 0) {
-                        delay(1000)
-                        _state.update {
-                            it.copy(tryAgainDuration = it.tryAgainDuration - 1000)
-                        }
-                    }
-                    _state.update {
-                        it.copy(
+                    settingPreferences.resetPinPromptAttempt(
+                        PinPromptAttempt(
+                            failedAttempt = 0,
                             maxFailedAttempt = false,
-                            tryAgainDuration = 30000
+                            lockedOutDuration =  userSecurity.lockedOutDuration
                         )
-                    }
+                    )
                 }
             }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
     }
 
     fun onAction(action: PinPromptAction) {
@@ -119,29 +113,24 @@ class PinPromptViewModel(
                             is Result.Success -> {
                                 if (result.data) {
                                     _event.send(PinPromptEvent.OnSuccessValidateSession)
-                                    settingPreferences.updateLatestTimeStamp()
                                 } else {
                                     _state.update {
                                         it.copy(
                                             isErrorVisible = true,
                                             errorMessage = UiText.StringResource(R.string.wrong_pin),
                                             pin = "",
-                                            failedAttempt = it.failedAttempt.plus(1)
                                         )
                                     }
+                                    settingPreferences.updateFailedAttempt(
+                                        settingPreferences.getPinPromptAttempt().first().failedAttempt.plus(1)
+                                    )
                                     dismissError()
                                 }
                             }
 
                             is Result.Error -> {
-                                _state.update {
-                                    it.copy(
-                                        isErrorVisible = true,
-                                        errorMessage = UiText.StringResource(R.string.error_proses),
-                                        pin = ""
-                                    )
-                                }
-                                dismissError()
+                                showError(UiText.StringResource(R.string.error_proses))
+                                _state.update { it.copy(pin = "") }
                             }
                         }
                     }
@@ -157,12 +146,29 @@ class PinPromptViewModel(
     }
 
     private fun handleLogout() {
-        // TODO save user preferences to db to persist latest preferences
         viewModelScope.launch {
-            settingPreferences.logout()
-            joinAll()
-            _event.send(PinPromptEvent.OnSuccessLogout)
+            when (coreRepository.logout()) {
+                /**
+                 * Do nothing since getUserId already observe in main activity
+                 **/
+                is Result.Success -> {}
+
+                is Result.Error -> {
+                    showError(UiText.StringResource(R.string.error_proses))
+                }
+            }
         }
+    }
+
+    private fun showError(message: UiText) {
+        if (_state.value.isErrorVisible) return
+        _state.update {
+            it.copy(
+                isErrorVisible = true,
+                errorMessage = message,
+            )
+        }
+        dismissError()
     }
 
     private fun dismissError() {

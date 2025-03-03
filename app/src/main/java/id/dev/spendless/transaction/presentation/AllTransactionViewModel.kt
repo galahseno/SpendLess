@@ -3,9 +3,10 @@ package id.dev.spendless.transaction.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.Transaction
-import id.dev.spendless.core.domain.model.TransactionGroup
+import id.dev.spendless.core.domain.model.transaction.Transaction
+import id.dev.spendless.core.domain.model.transaction.TransactionGroup
 import id.dev.spendless.core.presentation.ui.formatDateForHeader
+import id.dev.spendless.core.presentation.ui.formatDoubleDigit
 import id.dev.spendless.core.presentation.ui.formatTotalSpend
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
@@ -56,12 +57,15 @@ class AllTransactionViewModel(
                                     transactionName = allTransactions.transactionName,
                                     categoryEmoji = allTransactions.categoryEmoji,
                                     categoryName = allTransactions.categoryName,
-                                    amount = allTransactions.amount.formatTotalSpend(
-                                        expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
-                                        currency = CurrencyEnum.valueOf(session.currencySymbol),
-                                        decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
-                                        thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
-                                    ),
+                                    amount = allTransactions.amount
+                                        .toDouble()
+                                        .formatDoubleDigit()
+                                        .formatTotalSpend(
+                                            expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
+                                            currency = CurrencyEnum.valueOf(session.currencySymbol),
+                                            decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
+                                            thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
+                                        ),
                                     note = allTransactions.note,
                                     createdAt = allTransactions.createdAt
                                 )

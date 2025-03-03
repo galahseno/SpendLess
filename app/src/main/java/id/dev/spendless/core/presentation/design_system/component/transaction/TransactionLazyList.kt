@@ -32,8 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.R
-import id.dev.spendless.core.domain.model.Transaction
-import id.dev.spendless.core.domain.model.TransactionGroup
+import id.dev.spendless.core.domain.model.transaction.Transaction
+import id.dev.spendless.core.domain.model.transaction.TransactionGroup
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.componentBackground
 import id.dev.spendless.core.presentation.design_system.emojiIncomeBackground
@@ -196,6 +196,7 @@ private fun TransactionLazyListPreview() {
         TransactionLazyList(
             modifier = Modifier
                 .fillMaxSize()
+                .background(screenBackground)
                 .padding(10.dp),
             onItemClick = {},
             allTransactions = generateTransactionGroups(),

@@ -3,10 +3,11 @@ package id.dev.spendless.dashboard.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.LargestTransaction
-import id.dev.spendless.core.domain.model.Transaction
-import id.dev.spendless.core.domain.model.TransactionGroup
+import id.dev.spendless.core.domain.model.transaction.LargestTransaction
+import id.dev.spendless.core.domain.model.transaction.Transaction
+import id.dev.spendless.core.domain.model.transaction.TransactionGroup
 import id.dev.spendless.core.presentation.ui.formatDateForHeader
+import id.dev.spendless.core.presentation.ui.formatDoubleDigit
 import id.dev.spendless.core.presentation.ui.formatTotalSpend
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
@@ -27,7 +28,6 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Locale
 
 class DashboardViewModel(
     dashboardRepository: DashboardRepository,
@@ -42,32 +42,35 @@ class DashboardViewModel(
     init {
         combine(
             settingPreferences.getUserSession().distinctUntilChanged(),
-            dashboardRepository.getTotalBalance().distinctUntilChanged(),
-            dashboardRepository.getLargestTransaction().distinctUntilChanged(),
-            dashboardRepository.getTotalSpentPreviousWeek().distinctUntilChanged(),
-            dashboardRepository.getAllTransactions().distinctUntilChanged()
-        ) { session, balance, largestTransaction, totalSpendPreviousWeek, allTransactions ->
-            _state.update {
-                it.copy(
+            dashboardRepository.getTotalBalance().distinctUntilChanged()
+        ) { session, balance ->
+            _state.update { state ->
+                state.copy(
                     username = session.username,
-                    balance = String.format(Locale.getDefault(), "%.2f", balance).formatTotalSpend(
+                    balance = balance.formatDoubleDigit().formatTotalSpend(
                         expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
                         currency = CurrencyEnum.valueOf(session.currencySymbol),
                         decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
                         thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
                     ),
                     negativeBalance = balance?.let { it < 0.0 } ?: true,
-                    previousWeekSpend = totalSpendPreviousWeek.toString().formatTotalSpend(
-                        expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
-                        currency = CurrencyEnum.valueOf(session.currencySymbol),
-                        decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
-                        thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
-                    ),
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        combine(
+            settingPreferences.getUserSession().distinctUntilChanged(),
+            dashboardRepository.getLargestTransaction().distinctUntilChanged()
+        ) { session, largestTransaction ->
+            _state.update {
+                it.copy(
                     largestTransaction = largestTransaction?.let {
                         LargestTransaction(
                             transactionName = largestTransaction.transactionName,
                             amount = largestTransaction.amount
-                                ?.formatTotalSpend(
+                                ?.toDoubleOrNull()
+                                .formatDoubleDigit()
+                                .formatTotalSpend(
                                     expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
                                     currency = CurrencyEnum.valueOf(session.currencySymbol),
                                     decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
@@ -76,7 +79,33 @@ class DashboardViewModel(
                             createdAt = largestTransaction.createdAt?.toLong()?.formatTimestamp()
                         )
                     } ?: LargestTransaction(),
-                    allTransactions = allTransactions.groupBy { transaction ->
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        combine(
+            settingPreferences.getUserSession().distinctUntilChanged(),
+            dashboardRepository.getTotalSpentPreviousWeek().distinctUntilChanged()
+        ) { session, totalSpendPreviousWeek ->
+            _state.update {
+                it.copy(
+                    previousWeekSpend = totalSpendPreviousWeek.formatDoubleDigit().formatTotalSpend(
+                        expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
+                        currency = CurrencyEnum.valueOf(session.currencySymbol),
+                        decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
+                        thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
+                    ),
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        combine(
+            settingPreferences.getUserSession().distinctUntilChanged(),
+            dashboardRepository.getLatestTransactions().distinctUntilChanged()
+        ) { session, latestTransactions ->
+            _state.update {
+                it.copy(
+                    latestTransactions = latestTransactions.groupBy { transaction ->
                         LocalDateTime.ofInstant(
                             Instant.ofEpochMilli(transaction.createdAt),
                             ZoneId.systemDefault()
@@ -90,12 +119,15 @@ class DashboardViewModel(
                                     transactionName = allTransactions.transactionName,
                                     categoryEmoji = allTransactions.categoryEmoji,
                                     categoryName = allTransactions.categoryName,
-                                    amount = allTransactions.amount.formatTotalSpend(
-                                        expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
-                                        currency = CurrencyEnum.valueOf(session.currencySymbol),
-                                        decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
-                                        thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
-                                    ),
+                                    amount = allTransactions.amount
+                                        .toDouble()
+                                        .formatDoubleDigit()
+                                        .formatTotalSpend(
+                                            expensesFormat = ExpensesFormatEnum.valueOf(session.expensesFormat),
+                                            currency = CurrencyEnum.valueOf(session.currencySymbol),
+                                            decimal = DecimalSeparatorEnum.valueOf(session.decimalSeparator),
+                                            thousands = ThousandsSeparatorEnum.valueOf(session.thousandSeparator)
+                                        ),
                                     note = allTransactions.note,
                                     createdAt = allTransactions.createdAt
                                 )
@@ -105,7 +137,6 @@ class DashboardViewModel(
                 )
             }
         }.launchIn(viewModelScope)
-
 
         dashboardRepository
             .getLargestTransactionCategoryAllTime()
@@ -126,7 +157,7 @@ class DashboardViewModel(
             is DashboardAction.OnItemTransactionClick -> {
                 _state.update {
                     it.copy(
-                        allTransactions = it.allTransactions.map { group ->
+                        latestTransactions = it.latestTransactions.map { group ->
                             group.copy(
                                 transactions = group.transactions.map { transaction ->
                                     if (transaction.id == action.id) {

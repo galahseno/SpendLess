@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.auth.domain.AuthRepository
-import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-    private val settingPreferences: SettingPreferences,
     private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(RegisterState())
@@ -47,9 +45,7 @@ class RegisterViewModel(
                         } else if (!isValidUsername(username)) {
                             UiText.StringResource(R.string.invalid_username)
                         } else null,
-                        // TODO enable button when username at least one character and display error message when username not valid (button click)
-                        canRegister = !username.contains(" ") &&
-                                isValidUsername(username)
+                        canRegister = !username.contains(" ") && username.isNotEmpty()
                     )
                 }
             }
@@ -87,6 +83,11 @@ class RegisterViewModel(
     }
 
     private fun handleCheckUsername() {
+        if (!isValidUsername(_state.value.username)) {
+            showError(UiText.StringResource(R.string.invalid_username))
+            return
+        }
+
         viewModelScope.launch {
             when (val result = authRepository.checkUsernameExists(_state.value.username)) {
                 is Result.Success -> {
@@ -94,22 +95,13 @@ class RegisterViewModel(
                 }
 
                 is Result.Error -> {
-                    if (!_state.value.isErrorVisible) {
-                        _state.update {
-                            it.copy(
-                                isErrorVisible = true,
-                                errorMessage = UiText.StringResource(
-                                    when (result.error) {
-                                        DataError.Local.ERROR_PROSES -> R.string.error_proses
-                                        DataError.Local.USER_EXIST -> R.string.username_exists
-                                        else -> R.string.username_exists
-                                    }
-                                ),
-                                canRegister = false
-                            )
-                        }
-                        dismissError()
+                    val errorMessage = when (result.error) {
+                        DataError.Local.ERROR_PROSES -> R.string.error_proses
+                        DataError.Local.USER_EXIST -> R.string.username_exists
+                        else -> R.string.username_exists
                     }
+                    showError(UiText.StringResource(errorMessage))
+                    _state.update { it.copy(canRegister = false) }
                 }
             }
         }
@@ -159,16 +151,8 @@ class RegisterViewModel(
                 _event.send(RegisterEvent.OnProcessToOnboardingPreferences)
             }
         } else {
-            if (!_state.value.isErrorVisible) {
-                _state.update {
-                    it.copy(
-                        isErrorVisible = true,
-                        errorMessage = UiText.StringResource(R.string.pin_not_match),
-                        repeatPin = ""
-                    )
-                }
-                dismissError()
-            }
+            showError(UiText.StringResource(R.string.pin_not_match))
+            _state.update { it.copy(repeatPin = "") }
         }
     }
 
@@ -203,25 +187,19 @@ class RegisterViewModel(
     private fun handleSelectedDecimalSeparator(separator: DecimalSeparatorEnum) {
         val isSameSeparator = separator.name == _state.value.selectedThousandSeparator.name
 
-        if (isSameSeparator && !_state.value.isErrorVisible) {
-            _state.update {
-                it.copy(
-                    isErrorVisible = true,
-                    errorMessage = UiText.StringResource(R.string.invalid_separator)
-                )
-            }
-            dismissError()
+        if (isSameSeparator) {
+            showError(UiText.StringResource(R.string.invalid_separator))
         }
 
         _state.update {
             it.copy(
                 selectedDecimalSeparator = separator,
-                formattedTotalSpend = it.totalSpend.takeIf { !isSameSeparator }?.formatTotalSpend(
+                formattedTotalSpend = it.totalSpend.formatTotalSpend(
                     it.selectedExpenseFormat,
                     it.selectedCurrency,
                     separator,
                     it.selectedThousandSeparator
-                ) ?: it.formattedTotalSpend
+                )
             )
         }
     }
@@ -229,25 +207,19 @@ class RegisterViewModel(
     private fun handleSelectedThousandSeparator(separator: ThousandsSeparatorEnum) {
         val isSameSeparator = separator.name == _state.value.selectedDecimalSeparator.name
 
-        if (isSameSeparator && !_state.value.isErrorVisible) {
-            _state.update {
-                it.copy(
-                    isErrorVisible = true,
-                    errorMessage = UiText.StringResource(R.string.invalid_separator)
-                )
-            }
-            dismissError()
+        if (isSameSeparator) {
+            showError(UiText.StringResource(R.string.invalid_separator))
         }
 
         _state.update {
             it.copy(
                 selectedThousandSeparator = separator,
-                formattedTotalSpend = it.totalSpend.takeIf { !isSameSeparator }?.formatTotalSpend(
+                formattedTotalSpend = it.totalSpend.formatTotalSpend(
                     it.selectedExpenseFormat,
                     it.selectedCurrency,
                     it.selectedDecimalSeparator,
                     separator,
-                ) ?: it.formattedTotalSpend
+                )
             )
         }
     }
@@ -265,23 +237,25 @@ class RegisterViewModel(
 
             when (result) {
                 is Result.Error -> {
-                    if (!_state.value.isErrorVisible) {
-                        _state.update {
-                            it.copy(
-                                isErrorVisible = true,
-                                errorMessage = UiText.StringResource(R.string.error_proses),
-                            )
-                        }
-                        dismissError()
-                    }
+                    showError(UiText.StringResource(R.string.error_proses))
                 }
 
                 is Result.Success -> {
                     _event.send(RegisterEvent.OnRegisterSuccess)
-                    settingPreferences.updateLatestTimeStamp()
                 }
             }
         }
+    }
+
+    private fun showError(message: UiText) {
+        if (_state.value.isErrorVisible) return
+        _state.update {
+            it.copy(
+                isErrorVisible = true,
+                errorMessage = message,
+            )
+        }
+        dismissError()
     }
 
     private fun dismissError() {

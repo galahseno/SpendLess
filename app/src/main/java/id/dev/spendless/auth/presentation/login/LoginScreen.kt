@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -102,6 +103,12 @@ private fun LoginScreen(
         if (firstOpenScreen) {
             usernameFocus.requestFocus()
             firstOpenScreen = false
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            firstOpenScreen = true
         }
     }
 

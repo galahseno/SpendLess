@@ -1,5 +1,6 @@
 package id.dev.spendless.core.domain
 
+import id.dev.spendless.core.domain.model.PinPromptAttempt
 import id.dev.spendless.core.domain.model.UserSecurity
 import id.dev.spendless.core.domain.model.UserSession
 import kotlinx.coroutines.flow.Flow
@@ -42,4 +43,12 @@ interface SettingPreferences {
     suspend fun updateLatestTimeStamp()
     suspend fun checkSessionExpired(): Boolean
     suspend fun changeSession(value: Boolean)
+
+    fun getPinPromptAttempt(): Flow<PinPromptAttempt>
+
+    suspend fun resetPinPromptAttempt(value: PinPromptAttempt)
+
+    suspend fun updateFailedAttempt(value: Int)
+    suspend fun updateMaxAttemptPinPrompt(value: Boolean)
+    suspend fun updateLatestDuration(value: Long)
 }

@@ -88,7 +88,7 @@ fun RepeatIntervalDropDown(
                         .padding(8.dp)
                 )
                 Text(
-                    text = "${selectedRepeatInterval.repeatName} ${selectedRepeatInterval.formattedDate}",
+                    text = selectedRepeatInterval.toString(),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .weight(1f)
@@ -128,7 +128,7 @@ fun RepeatIntervalDropDown(
                                 },
                                 text = {
                                     Text(
-                                        text = "${item.repeatName} ${item.formattedDate}",
+                                        text = item.toString(),
                                         style = MaterialTheme.typography.titleMedium,
                                     )
                                 },
@@ -137,7 +137,7 @@ fun RepeatIntervalDropDown(
                                     expanded = false
                                 },
                                 trailingIcon = {
-                                    if (selectedRepeatInterval.repeatName == item.repeatName) {
+                                    if (selectedRepeatInterval == item) {
                                         Icon(
                                             imageVector = Icons.Rounded.Check,
                                             contentDescription = "selected_expense",

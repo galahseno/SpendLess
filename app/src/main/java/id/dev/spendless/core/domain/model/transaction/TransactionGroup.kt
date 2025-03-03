@@ -1,4 +1,4 @@
-package id.dev.spendless.core.domain.model
+package id.dev.spendless.core.domain.model.transaction
 
 data class TransactionGroup(
     val formattedDate: String,
@@ -13,5 +13,6 @@ data class Transaction(
     val amount: String,
     val note: String = "",
     val createdAt: Long,
+    val repeatInterval: String = "",
     val isNoteOpen: Boolean = false,
 )

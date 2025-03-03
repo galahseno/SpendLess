@@ -3,7 +3,9 @@ package id.dev.spendless.settings.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
+import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.SettingPreferences
+import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import id.dev.spendless.core.presentation.ui.formatTotalSpend
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
@@ -23,11 +25,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val settingPreferences: SettingPreferences
+    private val settingPreferences: SettingPreferences,
+    private val coreRepository: CoreRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SettingsState())
     val state = _state.asStateFlow()
@@ -102,11 +104,17 @@ class SettingsViewModel(
     }
 
     private fun handleLogoutClick() {
-        // TODO save user preferences to db to persist latest preferences
         viewModelScope.launch {
-            settingPreferences.logout()
-            joinAll()
-            _event.send(SettingsEvent.OnSuccessLogout)
+            when (coreRepository.logout()) {
+                /**
+                 * Do nothing since getUserId already observe in main activity
+                 **/
+                is Result.Success -> {}
+
+                is Result.Error -> {
+                    showError(UiText.StringResource(R.string.error_proses))
+                }
+            }
         }
     }
 
@@ -142,13 +150,7 @@ class SettingsViewModel(
         val isSameSeparator = separator.name == _state.value.selectedThousandSeparator.name
 
         if (isSameSeparator && !_state.value.isErrorVisible) {
-            _state.update {
-                it.copy(
-                    isErrorVisible = true,
-                    errorMessage = UiText.StringResource(R.string.invalid_separator)
-                )
-            }
-            dismissError()
+            showError(UiText.StringResource(R.string.invalid_separator))
         }
 
         _state.update {
@@ -168,13 +170,7 @@ class SettingsViewModel(
         val isSameSeparator = separator.name == _state.value.selectedDecimalSeparator.name
 
         if (isSameSeparator && !_state.value.isErrorVisible) {
-            _state.update {
-                it.copy(
-                    isErrorVisible = true,
-                    errorMessage = UiText.StringResource(R.string.invalid_separator)
-                )
-            }
-            dismissError()
+            showError(UiText.StringResource(R.string.invalid_separator))
         }
 
         _state.update {
@@ -203,18 +199,10 @@ class SettingsViewModel(
                     thousandSeparator = _state.value.selectedThousandSeparator.name
                 )
 
-                joinAll()
-
                 _event.send(SettingsEvent.OnSuccessSavePreferences)
             } catch (_: Exception) {
                 coroutineContext.ensureActive()
-                _state.update {
-                    it.copy(
-                        isErrorVisible = true,
-                        errorMessage = UiText.StringResource(R.string.error_proses),
-                    )
-                }
-                dismissError()
+                showError(UiText.StringResource(R.string.error_proses))
             }
         }
     }
@@ -243,20 +231,23 @@ class SettingsViewModel(
                     lockedOutDuration = _state.value.lockedOutDuration.millis
                 )
 
-                joinAll()
-
                 _event.send(SettingsEvent.OnSuccessSavePreferences)
             } catch (_: Exception) {
                 coroutineContext.ensureActive()
-                _state.update {
-                    it.copy(
-                        isErrorVisible = true,
-                        errorMessage = UiText.StringResource(R.string.error_proses),
-                    )
-                }
-                dismissError()
+                showError(UiText.StringResource(R.string.error_proses))
             }
         }
+    }
+
+    private fun showError(message: UiText) {
+        if (_state.value.isErrorVisible) return
+        _state.update {
+            it.copy(
+                isErrorVisible = true,
+                errorMessage = message,
+            )
+        }
+        dismissError()
     }
 
     private fun dismissError() {
