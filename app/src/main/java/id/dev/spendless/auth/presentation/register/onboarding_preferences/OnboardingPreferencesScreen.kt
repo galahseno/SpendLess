@@ -179,7 +179,7 @@ private fun OnboardingPreferencesScreen(
             )
             DecimalSeparator(
                 selectedSeparator = state.selectedDecimalSeparator,
-                onExpensesSelected = {
+                onSeparatorSelected = {
                     onAction(RegisterAction.OnDecimalSeparatorSelected(it))
                 }
             )
@@ -193,7 +193,7 @@ private fun OnboardingPreferencesScreen(
             )
             ThousandSeparator(
                 selectedSeparator = state.selectedThousandSeparator,
-                onExpensesSelected = {
+                onSeparatorSelected = {
                     onAction(RegisterAction.OnThousandSeparatorSelected(it))
                 }
             )

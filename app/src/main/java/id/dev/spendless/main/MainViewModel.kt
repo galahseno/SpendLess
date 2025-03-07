@@ -44,8 +44,16 @@ class MainViewModel(
 
     fun resetSession() {
         viewModelScope.launch {
-            if (settingPreferences.getUserId().first() != -1)
+            if (settingPreferences.getUserId().first() != -1) {
                 settingPreferences.changeSession(true)
+            }
+        }
+    }
+
+    fun resetSessionAndCloseBottomSheet() {
+        resetSession()
+        viewModelScope.launch {
+            settingPreferences.changeAddBottomSheetValue(false)
         }
     }
 

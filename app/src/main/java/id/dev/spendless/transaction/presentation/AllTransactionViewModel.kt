@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -75,6 +76,13 @@ class AllTransactionViewModel(
                 )
             }
         }.launchIn(viewModelScope)
+
+        settingPreferences
+            .getBottomSheetValue()
+            .distinctUntilChanged()
+            .onEach { bottomSheetValue ->
+                _state.update { it.copy(showBottomSheet = bottomSheetValue) }
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: AllTransactionAction) {
@@ -102,12 +110,14 @@ class AllTransactionViewModel(
                     val isSessionValid = settingPreferences.checkSessionExpired()
                     if (isSessionValid) return@launch
 
-                    _state.update { it.copy(showBottomSheet = true) }
+                    settingPreferences.changeAddBottomSheetValue(true)
                 }
             }
 
             is AllTransactionAction.OnCloseBottomSheet -> {
-                _state.update { it.copy(showBottomSheet = false) }
+                viewModelScope.launch {
+                    settingPreferences.changeAddBottomSheetValue(false)
+                }
             }
 
             else -> Unit

@@ -46,9 +46,12 @@ interface SettingPreferences {
 
     fun getPinPromptAttempt(): Flow<PinPromptAttempt>
 
-    suspend fun resetPinPromptAttempt(value: PinPromptAttempt)
+    suspend fun resetPinPromptAttempt(lockedOutDuration: Long)
 
     suspend fun updateFailedAttempt(value: Int)
     suspend fun updateMaxAttemptPinPrompt(value: Boolean)
     suspend fun updateLatestDuration(value: Long)
+
+    suspend fun changeAddBottomSheetValue(value: Boolean)
+    fun getBottomSheetValue(): Flow<Boolean>
 }

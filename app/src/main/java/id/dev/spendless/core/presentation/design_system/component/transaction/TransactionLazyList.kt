@@ -207,7 +207,6 @@ private fun TransactionLazyListPreview() {
 fun generateTransactionGroups(): List<TransactionGroup> {
     val transactionGroups = ArrayList<TransactionGroup>()
 
-    // Today's Transactions
     val today = LocalDate.now()
     val todayTransactions = ArrayList<Transaction>()
     todayTransactions.add(
@@ -234,7 +233,6 @@ fun generateTransactionGroups(): List<TransactionGroup> {
     )
     transactionGroups.add(TransactionGroup("Today", todayTransactions))
 
-    // Yesterday's Transactions
     val yesterday = today.minusDays(1)
     val yesterdayTransactions = ArrayList<Transaction>()
     yesterdayTransactions.add(
@@ -250,7 +248,6 @@ fun generateTransactionGroups(): List<TransactionGroup> {
     )
     transactionGroups.add(TransactionGroup("Yesterday", yesterdayTransactions))
 
-    // Transactions from 3 days ago
     val threeDaysAgo = today.minusDays(3)
     val threeDaysAgoTransactions = ArrayList<Transaction>()
     threeDaysAgoTransactions.add(
@@ -271,7 +268,6 @@ fun generateTransactionGroups(): List<TransactionGroup> {
         )
     )
 
-    // Transactions from 5 days ago
     val fiveDaysAgo = today.minusDays(5)
     val fiveDaysAgoTransactions = ArrayList<Transaction>()
     fiveDaysAgoTransactions.add(

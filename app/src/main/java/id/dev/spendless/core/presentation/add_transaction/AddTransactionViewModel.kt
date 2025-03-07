@@ -171,7 +171,6 @@ class AddTransactionViewModel(
         }
     }
 
-    // TODO Handle thousand separator
     private fun handleExpenseOrIncomeAmountChanged(
         transactionType: TransactionTypeEnum,
         value: String

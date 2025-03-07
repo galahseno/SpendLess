@@ -8,7 +8,6 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-// TODO use material theme
 val screenBackground = Color(0xFFFEF7FF)
 val sheetBackground = Color(0xFFF6F3F3)
 val componentBackground = Color(0xFFFFFFFF)

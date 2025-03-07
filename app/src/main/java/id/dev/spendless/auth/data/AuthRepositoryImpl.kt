@@ -1,6 +1,5 @@
 package id.dev.spendless.auth.data
 
-import android.util.Log
 import id.dev.spendless.auth.domain.AuthRepository
 import id.dev.spendless.core.data.database.dao.PreferencesDao
 import id.dev.spendless.core.data.database.dao.UserDao
@@ -61,9 +60,8 @@ class AuthRepositoryImpl(
 
             return Result.Success(Unit)
 
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             coroutineContext.ensureActive()
-            Log.e("AuthRepositoryImpl", "registerAccount: ${e.message}", e)
             return Result.Error(DataError.Local.ERROR_PROSES)
         }
     }

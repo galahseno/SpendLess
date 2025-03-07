@@ -61,7 +61,6 @@ fun PreferencesScreenRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             is SettingsEvent.OnSuccessSavePreferences -> onBackClick()
-            else -> Unit
         }
     }
 
@@ -156,7 +155,7 @@ private fun PreferencesScreen(
                 )
                 DecimalSeparator(
                     selectedSeparator = state.selectedDecimalSeparator,
-                    onExpensesSelected = {
+                    onSeparatorSelected = {
                         onAction(SettingsAction.OnDecimalSeparatorSelected(it))
                     }
                 )
@@ -170,7 +169,7 @@ private fun PreferencesScreen(
                 )
                 ThousandSeparator(
                     selectedSeparator = state.selectedThousandSeparator,
-                    onExpensesSelected = {
+                    onSeparatorSelected = {
                         onAction(SettingsAction.OnThousandSeparatorSelected(it))
                     }
                 )

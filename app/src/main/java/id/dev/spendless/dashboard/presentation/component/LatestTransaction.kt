@@ -1,5 +1,6 @@
 package id.dev.spendless.dashboard.presentation.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.component.transaction.TransactionLazyList
 import id.dev.spendless.core.presentation.design_system.component.transaction.generateTransactionGroups
+import id.dev.spendless.core.presentation.design_system.screenBackground
 
 @Composable
 fun LatestTransaction(
@@ -71,6 +73,7 @@ private fun LatestTransactionPreview() {
         LatestTransaction(
             modifier = Modifier
                 .fillMaxSize()
+                .background(screenBackground)
                 .padding(10.dp),
             onShowAllClick = {},
             allTransactions = generateTransactionGroups(),

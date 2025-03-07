@@ -22,7 +22,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-class SpendLessApp: Application() {
+class SpendLessApp : Application() {
     val applicationScope = CoroutineScope(SupervisorJob())
     private lateinit var appLifecycleObserver: AppLifecycleObserver
 
@@ -47,9 +47,10 @@ class SpendLessApp: Application() {
                 settingsPresentationModule
             )
         }
-        appLifecycleObserver = AppLifecycleObserver(applicationScope) {
-            viewModel.resetSession()
-        }
+        appLifecycleObserver = AppLifecycleObserver(applicationScope,
+            onAppBackground = viewModel::resetSession,
+            onAppCreate = viewModel::resetSessionAndCloseBottomSheet
+        )
         ProcessLifecycleOwner.get().lifecycle.addObserver(appLifecycleObserver)
     }
 }

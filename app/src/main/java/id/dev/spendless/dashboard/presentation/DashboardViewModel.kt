@@ -150,6 +150,17 @@ class DashboardViewModel(
                     }
                 }
             }.launchIn(viewModelScope)
+
+        settingPreferences
+            .getBottomSheetValue()
+            .distinctUntilChanged()
+            .onEach { showBottomSheet ->
+                _state.update {
+                    it.copy(
+                        showBottomSheet = showBottomSheet
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: DashboardAction) {
@@ -177,7 +188,7 @@ class DashboardViewModel(
                     val isSessionValid = settingPreferences.checkSessionExpired()
                     if (isSessionValid) return@launch
 
-                    _state.update { it.copy(showBottomSheet = true) }
+                    settingPreferences.changeAddBottomSheetValue(true)
                 }
             }
 
@@ -188,7 +199,9 @@ class DashboardViewModel(
             }
 
             is DashboardAction.OnCloseBottomSheet -> {
-                _state.update { it.copy(showBottomSheet = false) }
+                viewModelScope.launch {
+                    settingPreferences.changeAddBottomSheetValue(false)
+                }
             }
         }
     }

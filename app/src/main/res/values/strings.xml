@@ -60,6 +60,7 @@
     <string name="disable">Disable</string>
     <string name="hello_pin_prompt">Hello, %1$s!</string>
     <string name="wrong_pin">Wrong PIN</string>
+    <string name="wrong_biometric">Could not recognise your fingerprint</string>
     <string name="too_many_failed_attempts">Too many failed attempts</string>
     <string name="try_your_pin_again_in">Try your PIN again in %1$s</string>
     <string name="cancel">Cancel</string>

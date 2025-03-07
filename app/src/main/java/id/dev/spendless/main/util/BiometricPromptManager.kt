@@ -16,6 +16,26 @@ class BiometricPromptManager(
     private val resultChannel = Channel<BiometricResult>()
     val promptResults = resultChannel.receiveAsFlow()
 
+    private val biometricPrompt = BiometricPrompt(
+        activity,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                resultChannel.trySend(BiometricResult.AuthenticationError(errString.toString()))
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                resultChannel.trySend(BiometricResult.AuthenticationSuccess)
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                resultChannel.trySend(BiometricResult.AuthenticationFailed)
+            }
+        }
+    )
+
     fun showBiometricPrompt(
         title: String,
         description: String
@@ -50,26 +70,11 @@ class BiometricPromptManager(
             else -> Unit
         }
 
-        val prompt = BiometricPrompt(
-            activity,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    resultChannel.trySend(BiometricResult.AuthenticationError(errString.toString()))
-                }
+        biometricPrompt.authenticate(promptInfo.build())
+    }
 
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    resultChannel.trySend(BiometricResult.AuthenticationSuccess)
-                }
-
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    resultChannel.trySend(BiometricResult.AuthenticationFailed)
-                }
-            }
-        )
-        prompt.authenticate(promptInfo.build())
+    fun cancelBiometricPrompt() {
+        biometricPrompt.cancelAuthentication()
     }
 
     sealed interface BiometricResult {

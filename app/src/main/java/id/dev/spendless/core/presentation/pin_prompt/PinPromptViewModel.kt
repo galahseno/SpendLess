@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.SettingPreferences
-import id.dev.spendless.core.domain.model.PinPromptAttempt
 import id.dev.spendless.core.domain.util.Result
 import id.dev.spendless.core.presentation.ui.UiText
 import kotlinx.coroutines.channels.Channel
@@ -63,20 +62,14 @@ class PinPromptViewModel(
             if (pinPromptAttempt.maxFailedAttempt) {
                 if (_state.value.lockedOutDuration > 0) {
                     delay(1000)
-                    settingPreferences.updateLatestDuration( _state.value.lockedOutDuration - 1000)
+                    settingPreferences.updateLatestDuration(_state.value.lockedOutDuration - 1000)
                 } else {
                     _state.update {
                         it.copy(
                             lockedOutDuration = userSecurity.lockedOutDuration
                         )
                     }
-                    settingPreferences.resetPinPromptAttempt(
-                        PinPromptAttempt(
-                            failedAttempt = 0,
-                            maxFailedAttempt = false,
-                            lockedOutDuration =  userSecurity.lockedOutDuration
-                        )
-                    )
+                    settingPreferences.resetPinPromptAttempt(userSecurity.lockedOutDuration)
                 }
             }
         }.launchIn(viewModelScope)
@@ -88,7 +81,17 @@ class PinPromptViewModel(
             is PinPromptAction.OnDeletePin -> handleDeletePin()
             is PinPromptAction.OnLogoutClick -> handleLogout()
             is PinPromptAction.OnSuccessValidateSession -> handleSuccessValidateSession()
+            is PinPromptAction.OnFailedBiometricValidation -> handleFailedBiometricValidation()
             else -> Unit
+        }
+    }
+
+    private fun handleFailedBiometricValidation() {
+        viewModelScope.launch {
+            showError(UiText.StringResource(R.string.wrong_biometric))
+            settingPreferences.updateFailedAttempt(
+                settingPreferences.getPinPromptAttempt().first().failedAttempt.plus(1)
+            )
         }
     }
 
@@ -114,17 +117,16 @@ class PinPromptViewModel(
                                 if (result.data) {
                                     _event.send(PinPromptEvent.OnSuccessValidateSession)
                                 } else {
+                                    showError(UiText.StringResource(R.string.wrong_pin))
                                     _state.update {
                                         it.copy(
-                                            isErrorVisible = true,
-                                            errorMessage = UiText.StringResource(R.string.wrong_pin),
-                                            pin = "",
+                                            pin = ""
                                         )
                                     }
                                     settingPreferences.updateFailedAttempt(
-                                        settingPreferences.getPinPromptAttempt().first().failedAttempt.plus(1)
+                                        settingPreferences.getPinPromptAttempt()
+                                            .first().failedAttempt.plus(1)
                                     )
-                                    dismissError()
                                 }
                             }
 

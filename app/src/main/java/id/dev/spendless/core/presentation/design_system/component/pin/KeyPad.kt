@@ -1,6 +1,8 @@
 package id.dev.spendless.core.presentation.design_system.component.pin
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.keyPadBackground
+import id.dev.spendless.core.presentation.design_system.screenBackground
 
 @Composable
 fun KeyPad(
@@ -34,6 +37,7 @@ fun KeyPad(
     onBiometricClick: () -> Unit,
     modifier: Modifier = Modifier,
     isBiometricEnabled: Boolean = false,
+    isBiometricVisible: Boolean = false,
     keyPadEnable: Boolean = true,
     padBackground: Color = keyPadBackground
 ) {
@@ -62,7 +66,7 @@ fun KeyPad(
                             isBiometricEnabled = isBiometricEnabled,
                             onBiometricClick = onBiometricClick,
                             keyPadBackground = padBackground,
-                            keyPadEnable = keyPadEnable
+                            isBiometricVisible = isBiometricVisible
                         )
 
                         "delete" -> DeleteButton(
@@ -129,16 +133,16 @@ private fun BiometricButton(
     isBiometricEnabled: Boolean,
     onBiometricClick: () -> Unit,
     keyPadBackground: Color,
-    keyPadEnable: Boolean = true
+    isBiometricVisible: Boolean = true
 ) {
     KeyPadButton(
-        enabled = isBiometricEnabled && keyPadEnable,
+        enabled = isBiometricEnabled && isBiometricVisible,
         onClick = { if (isBiometricEnabled) onBiometricClick() },
         containerColor = if (isBiometricEnabled) keyPadBackground.copy(alpha = 0.3f)
         else Color.Transparent,
         disabledContainerColor = Color.Transparent,
         content = {
-            if (isBiometricEnabled) {
+            if (isBiometricVisible) {
                 Icon(
                     imageVector = Icons.Rounded.Fingerprint,
                     modifier = Modifier.size(34.dp),
@@ -177,14 +181,20 @@ private fun KeyPadButton(
 @Composable
 private fun KeyPadPreview() {
     SpendLessTheme {
-        KeyPad(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            onNumberPadClick = {},
-            onDeletePadClick = {},
-            onBiometricClick = {},
-            isBiometricEnabled = true,
-        )
+                .background(screenBackground)
+        ) {
+            KeyPad(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                onNumberPadClick = {},
+                onDeletePadClick = {},
+                onBiometricClick = {},
+                isBiometricEnabled = false,
+                isBiometricVisible = true
+            )
+        }
     }
 }

@@ -1,17 +1,17 @@
 package id.dev.spendless.core.presentation.add_transaction.component
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,10 +22,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
@@ -41,119 +50,81 @@ fun AddTransactionType(
     onTransactionTypeSelected: (TransactionTypeEnum) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(buttonBackground.copy(alpha = .08f))
-            .padding(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        TransactionTypeEnum.entries.forEach { type ->
-            AnimatedContent(
-                label = "animated_expense_format",
-                modifier = Modifier.weight(1f),
-                targetState = selectedTransactionType,
-                transitionSpec = {
-                    getTransactionTypeSeparatorTransitionSpec(type, targetState)
-                }
-            ) {
-                TransactionBox(
-                    text = type.name,
-                    modifier = Modifier.weight(1f),
-                    isSelected = it == type,
-                    onTypeSelected = {
-                        onTransactionTypeSelected(type)
-                    }
-                )
-            }
+    val backgroundColor = buttonBackground.copy(alpha = .08f)
+    val selectedColor = componentBackground
 
-        }
+    var rowWidthPx by remember { mutableFloatStateOf(1f) }
+    val density = LocalDensity.current
+    val rowWidthDp = with(density) { rowWidthPx.toDp() }
+
+    val selectedWidthDp = rowWidthDp / TransactionTypeEnum.entries.size
+    val offsetX = remember { Animatable(0f) }
+
+    LaunchedEffect(selectedTransactionType, rowWidthPx) {
+        val selectedWidthPx = rowWidthPx / TransactionTypeEnum.entries.size
+        val targetX = TransactionTypeEnum.valueOf(selectedTransactionType.toString()).ordinal * selectedWidthPx
+        offsetX.animateTo(
+            targetValue = targetX,
+            animationSpec = tween(300)
+        )
     }
-}
 
-@Composable
-private fun TransactionBox(
-    isSelected: Boolean,
-    text: String,
-    onTypeSelected: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
     Box(
         modifier = modifier
-            .height(40.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .then(
-                if (isSelected) {
-                    Modifier.background(componentBackground)
-                } else {
-                    Modifier
-                }
-            )
-            .clickable {
-                onTypeSelected()
-            },
-        contentAlignment = Alignment.Center
+            .height(48.dp)
+            .fillMaxWidth()
+            .background(backgroundColor, shape = RoundedCornerShape(16.dp))
+            .padding(4.dp)
+            .onSizeChanged { newSize ->
+                rowWidthPx = newSize.width.toFloat()
+            }
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                .offset { IntOffset(offsetX.value.toInt(), 0) }
+                .width(selectedWidthDp)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(12.dp))
+                .background(selectedColor)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Icon(
-                imageVector = if (text == TransactionTypeEnum.Expenses.name)
-                    Icons.AutoMirrored.Rounded.TrendingDown
-                else Icons.AutoMirrored.Rounded.TrendingUp,
-                contentDescription = "",
-                tint = if (isSelected) buttonBackground else unselectedColor
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontSize = 16.sp,
-                    color = if (isSelected) buttonBackground else unselectedColor
-                )
-            )
+            TransactionTypeEnum.entries.forEach { type ->
+                val isSelected = type == selectedTransactionType
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .pointerInput(Unit) { detectTapGestures { onTransactionTypeSelected(type) } },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                    ) {
+                        Icon(
+                            imageVector = if (type.name == TransactionTypeEnum.Expenses.name)
+                                Icons.AutoMirrored.Rounded.TrendingDown
+                            else Icons.AutoMirrored.Rounded.TrendingUp,
+                            contentDescription = "",
+                            tint = if (isSelected) buttonBackground else unselectedColor
+                        )
+                        Text(
+                            text = type.name,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontSize = 16.sp,
+                                color = if (isSelected) buttonBackground else unselectedColor
+                            )
+                        )
+                    }
+                }
+            }
         }
-    }
-}
-
-private fun AnimatedContentTransitionScope<TransactionTypeEnum>.getTransactionTypeSeparatorTransitionSpec(
-    separator: TransactionTypeEnum,
-    targetState: TransactionTypeEnum
-) = when {
-    /**
-     * If the separator is Expense and target is Income
-     **/
-    separator == TransactionTypeEnum.Expenses && targetState == TransactionTypeEnum.Income -> {
-        EnterTransition.None togetherWith slideOutOfContainer(
-            AnimatedContentTransitionScope.SlideDirection.Right
-        )
-    }
-
-    /**
-     * If the separator is Expenses
-     **/
-    separator == TransactionTypeEnum.Expenses -> {
-        slideIntoContainer(
-            AnimatedContentTransitionScope.SlideDirection.Left
-        ) togetherWith ExitTransition.None
-    }
-    /**
-     * If the target is Expense
-     **/
-    targetState == TransactionTypeEnum.Expenses -> {
-        EnterTransition.None togetherWith slideOutOfContainer(
-            AnimatedContentTransitionScope.SlideDirection.Left
-        )
-    }
-    /**
-     * Default Case
-     **/
-    else -> {
-        slideIntoContainer(
-            AnimatedContentTransitionScope.SlideDirection.Right
-        ) togetherWith ExitTransition.None
     }
 }
 

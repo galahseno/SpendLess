@@ -300,8 +300,6 @@ private fun DashboardStateSummaryPreview() {
                     ),
                     createdAt = System.currentTimeMillis().formatTimestamp(),
                 ),
-//                largestTransactionAllTime = null,
-//                largestTransaction = null
             )
         }
     }

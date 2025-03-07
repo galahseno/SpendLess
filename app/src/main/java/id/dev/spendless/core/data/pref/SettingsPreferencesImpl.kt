@@ -5,9 +5,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import id.dev.spendless.core.data.pref.model.PinPromptAttemptPref
+import id.dev.spendless.core.data.pref.model.UserSecurityPref
+import id.dev.spendless.core.data.pref.model.UserSessionPref
+import id.dev.spendless.core.data.pref.model.toPinPromptAttempt
+import id.dev.spendless.core.data.pref.model.toUserSecurity
+import id.dev.spendless.core.data.pref.model.toUserSession
 import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.model.PinPromptAttempt
 import id.dev.spendless.core.domain.model.UserSecurity
@@ -16,36 +20,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-// TODO encrypt data store
 class SettingPreferencesImpl(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val userSessionDataStore: DataStore<UserSessionPref>,
+    private val userSecurityDataStore: DataStore<UserSecurityPref>,
+    private val pinPromptDataStore: DataStore<PinPromptAttemptPref>
 ) : SettingPreferences {
 
     override fun getUserId(): Flow<Int> {
-        return dataStore.data.map { preferences ->
-            preferences[USER_ID_KEY] ?: -1
-        }
+        return userSessionDataStore.data.map { it.userId }
     }
 
     override fun getUserSession(): Flow<UserSession> {
-        return dataStore.data.map {
-            UserSession(
-                username = it[USER_NAME_KEY] ?: "",
-                expensesFormat = it[EXPENSES_FORMAT_KEY] ?: "MinusPrefix",
-                currencySymbol = it[CURRENCY_KEY] ?: "USD",
-                decimalSeparator = it[DECIMAL_SEPARATOR_KEY] ?: "Dot",
-                thousandSeparator = it[THOUSAND_SEPARATOR_KEY] ?: "Comma",
-            )
+        return userSessionDataStore.data.map {
+            it.toUserSession()
         }
     }
 
     override fun getUserSecurity(): Flow<UserSecurity> {
-        return dataStore.data.map {
-            UserSecurity(
-                biometricPromptEnable = it[BIOMETRICS_KEY] ?: false,
-                sessionExpiryDuration = it[SESSION_EXPIRED_DURATION_KEY] ?: 300000,
-                lockedOutDuration = it[LOCKED_DURATION_KEY] ?: 30000
-            )
+        return userSecurityDataStore.data.map {
+            it.toUserSecurity()
         }
     }
 
@@ -57,13 +51,15 @@ class SettingPreferencesImpl(
         decimalSeparator: String,
         thousandSeparator: String
     ) {
-        dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = userId
-            preferences[USER_NAME_KEY] = username
-            preferences[EXPENSES_FORMAT_KEY] = expensesFormat
-            preferences[CURRENCY_KEY] = currencySymbol
-            preferences[DECIMAL_SEPARATOR_KEY] = decimalSeparator
-            preferences[THOUSAND_SEPARATOR_KEY] = thousandSeparator
+        userSessionDataStore.updateData {
+            it.copy(
+                userId = userId,
+                username = username,
+                expensesFormat = expensesFormat,
+                currencySymbol = currencySymbol,
+                decimalSeparator = decimalSeparator,
+                thousandSeparator = thousandSeparator
+            )
         }
         updateLatestTimeStamp()
     }
@@ -72,9 +68,11 @@ class SettingPreferencesImpl(
         userId: Int,
         username: String,
     ) {
-        dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = userId
-            preferences[USER_NAME_KEY] = username
+        userSessionDataStore.updateData {
+            it.copy(
+                userId = userId,
+                username = username
+            )
         }
         updateLatestTimeStamp()
     }
@@ -85,11 +83,13 @@ class SettingPreferencesImpl(
         decimalSeparator: String,
         thousandSeparator: String
     ) {
-        dataStore.edit { preferences ->
-            preferences[EXPENSES_FORMAT_KEY] = expensesFormat
-            preferences[CURRENCY_KEY] = currencySymbol
-            preferences[DECIMAL_SEPARATOR_KEY] = decimalSeparator
-            preferences[THOUSAND_SEPARATOR_KEY] = thousandSeparator
+        userSessionDataStore.updateData {
+            it.copy(
+                expensesFormat = expensesFormat,
+                currencySymbol = currencySymbol,
+                decimalSeparator = decimalSeparator,
+                thousandSeparator = thousandSeparator
+            )
         }
     }
 
@@ -98,29 +98,35 @@ class SettingPreferencesImpl(
         sessionExpiryDuration: Long,
         lockedOutDuration: Long
     ) {
-        dataStore.edit { preferences ->
-            preferences[BIOMETRICS_KEY] = biometricPromptEnable
-            preferences[SESSION_EXPIRED_DURATION_KEY] = sessionExpiryDuration
-            preferences[LOCKED_DURATION_KEY] = lockedOutDuration
-            preferences[LATEST_DURATION_KEY] = lockedOutDuration
+        userSecurityDataStore.updateData {
+            it.copy(
+                biometricPromptEnable = biometricPromptEnable,
+                sessionExpiryDuration = sessionExpiryDuration,
+                lockedOutDuration = lockedOutDuration
+            )
+        }
+        pinPromptDataStore.updateData {
+            it.copy(
+                lockedOutDuration = lockedOutDuration
+            )
         }
     }
 
     override suspend fun logout() {
-        dataStore.edit {
-            it.clear()
-        }
+        dataStore.edit { it.clear() }
+        userSessionDataStore.updateData { UserSessionPref() }
+        userSecurityDataStore.updateData { UserSecurityPref() }
+        pinPromptDataStore.updateData { PinPromptAttemptPref() }
     }
 
     override fun getSessionExpired(): Flow<Boolean> {
+        val userId = userSessionDataStore.data.map { it.userId }
         return dataStore.data.map { preferences ->
-            preferences[USER_ID_KEY]?.let { userId ->
-                if (userId != -1) {
-                    preferences[SESSION_EXPIRED_KEY] ?: false
-                } else {
-                    false
-                }
-            } ?: false
+            if (userId.first() != -1) {
+                preferences[SESSION_EXPIRED_KEY] ?: false
+            } else {
+                false
+            }
         }
     }
 
@@ -136,9 +142,8 @@ class SettingPreferencesImpl(
         }.first()
 
         val timeStamp = SystemClock.elapsedRealtime()
-
-        val sessionExpiryDuration = dataStore.data.map {
-            it[SESSION_EXPIRED_DURATION_KEY] ?: 300000
+        val sessionExpiryDuration = userSecurityDataStore.data.map {
+            it.sessionExpiryDuration
         }.first()
 
         val isSessionExpired = timeStamp < latestTimestamp ||
@@ -157,57 +162,39 @@ class SettingPreferencesImpl(
     }
 
     override fun getPinPromptAttempt(): Flow<PinPromptAttempt> {
-        return dataStore.data.map {
-            PinPromptAttempt(
-                failedAttempt = it[FAILED_ATTEMPT_PIN_PROMPT_KEY] ?: 0,
-                maxFailedAttempt = it[MAX_ATTEMPT_PIN_PROMPT_KEY] ?: false,
-                lockedOutDuration = it[LATEST_DURATION_KEY] ?: 30000
-            )
+        return pinPromptDataStore.data.map {
+            it.toPinPromptAttempt()
         }
     }
 
-    override suspend fun resetPinPromptAttempt(value: PinPromptAttempt) {
-        dataStore.edit {
-            it[FAILED_ATTEMPT_PIN_PROMPT_KEY] = value.failedAttempt
-            it[MAX_ATTEMPT_PIN_PROMPT_KEY] = value.maxFailedAttempt
-            it[LATEST_DURATION_KEY] = value.lockedOutDuration
+    override suspend fun resetPinPromptAttempt(lockedOutDuration: Long) {
+        pinPromptDataStore.updateData {
+            PinPromptAttemptPref(lockedOutDuration = lockedOutDuration)
         }
     }
 
     override suspend fun updateFailedAttempt(value: Int) {
-        dataStore.edit {
-            it[FAILED_ATTEMPT_PIN_PROMPT_KEY] = value
-        }
+        pinPromptDataStore.updateData { it.copy(failedAttempt = value) }
     }
 
     override suspend fun updateMaxAttemptPinPrompt(value: Boolean) {
-        dataStore.edit {
-            it[MAX_ATTEMPT_PIN_PROMPT_KEY] = value
-        }
+        pinPromptDataStore.updateData { it.copy(maxFailedAttempt = value) }
     }
 
     override suspend fun updateLatestDuration(value: Long) {
-        dataStore.edit {
-            it[LATEST_DURATION_KEY] = value
-        }
+        pinPromptDataStore.updateData { it.copy(lockedOutDuration = value) }
+    }
+
+    override suspend fun changeAddBottomSheetValue(value: Boolean) {
+        userSessionDataStore.updateData { it.copy(addBottomSheetState = value) }
+    }
+
+    override fun getBottomSheetValue(): Flow<Boolean> {
+        return userSessionDataStore.data.map { it.addBottomSheetState }
     }
 
     private companion object {
-        val USER_ID_KEY = intPreferencesKey("user_id")
-        val USER_NAME_KEY = stringPreferencesKey("user_name")
-        val EXPENSES_FORMAT_KEY = stringPreferencesKey("expenses_format")
-        val CURRENCY_KEY = stringPreferencesKey("Currency")
-        val DECIMAL_SEPARATOR_KEY = stringPreferencesKey("decimal_separator")
-        val THOUSAND_SEPARATOR_KEY = stringPreferencesKey("thousand_separator")
-
-        val BIOMETRICS_KEY = booleanPreferencesKey("biometrics")
-        val SESSION_EXPIRED_DURATION_KEY = longPreferencesKey("session_expired_duration")
-        val LOCKED_DURATION_KEY = longPreferencesKey("locked_duration")
-
         val LATEST_TIMESTAMP_KEY = longPreferencesKey("latest_timestamp")
         val SESSION_EXPIRED_KEY = booleanPreferencesKey("session_expired")
-        val FAILED_ATTEMPT_PIN_PROMPT_KEY = intPreferencesKey("attempt_pin_prompt")
-        val MAX_ATTEMPT_PIN_PROMPT_KEY = booleanPreferencesKey("max_pin_prompt_failed")
-        val LATEST_DURATION_KEY = longPreferencesKey("latest_duration")
     }
 }

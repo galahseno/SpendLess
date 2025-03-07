@@ -81,22 +81,18 @@ fun PinPromptScreenRoot(
     )
 
     ObserveAsEvents(promptManager.promptResults) { promptResult ->
-        // TODO handle result
         when (promptResult) {
             is BiometricPromptManager.BiometricResult.AuthenticationSuccess -> {
                 viewModel.onAction(PinPromptAction.OnSuccessValidateSession)
             }
 
-            is BiometricPromptManager.BiometricResult.AuthenticationError -> {
-
-            }
-
             BiometricPromptManager.BiometricResult.AuthenticationFailed -> {
-
+                promptManager.cancelBiometricPrompt()
+                viewModel.onAction(PinPromptAction.OnFailedBiometricValidation)
             }
 
             BiometricPromptManager.BiometricResult.AuthenticationNotSet -> {
-                if (Build.VERSION.SDK_INT >= 30) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
                         putExtra(
                             Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
@@ -104,16 +100,15 @@ fun PinPromptScreenRoot(
                         )
                     }
                     enrollLauncher.launch(enrollIntent)
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    @Suppress("DEPRECATION")
+                    enrollLauncher.launch(Intent(Settings.ACTION_FINGERPRINT_ENROLL))
+                } else {
+                    enrollLauncher.launch(Intent(Settings.ACTION_SECURITY_SETTINGS))
                 }
             }
 
-            BiometricPromptManager.BiometricResult.FeatureUnavailable -> {
-
-            }
-
-            BiometricPromptManager.BiometricResult.HardwareUnavailable -> {
-
-            }
+            else -> Unit
         }
     }
 
@@ -202,7 +197,8 @@ private fun PinPromptScreen(
             KeyPad(
                 modifier = Modifier
                     .fillMaxWidth(),
-                isBiometricEnabled = state.biometricsEnabled,
+                isBiometricEnabled = !state.maxFailedAttempt && state.biometricsEnabled,
+                isBiometricVisible = true,
                 keyPadEnable = !state.maxFailedAttempt,
                 onBiometricClick = {
                     onAction(PinPromptAction.OnBiometricClick)
@@ -262,7 +258,7 @@ private fun PinPromptScreenPreview() {
         PinPromptScreen(
             state = PinPromptState(
                 username = "rockefeller74",
-                biometricsEnabled = true,
+                biometricsEnabled = false,
                 maxFailedAttempt = true
             ),
             onAction = {}

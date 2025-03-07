@@ -2,6 +2,7 @@ package id.dev.spendless.core.presentation.add_transaction
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ import id.dev.spendless.core.presentation.design_system.component.SpendLessButto
 import id.dev.spendless.core.presentation.design_system.component.SpendLessErrorContainer
 import id.dev.spendless.core.presentation.design_system.errorHeightClosedKeyboard
 import id.dev.spendless.core.presentation.design_system.errorHeightOpenKeyboard
+import id.dev.spendless.core.presentation.design_system.screenBackground
 import id.dev.spendless.core.presentation.design_system.sheetBackground
 import id.dev.spendless.core.presentation.ui.ObserveAsEvents
 import id.dev.spendless.core.presentation.ui.keyboardOpenAsState
@@ -356,12 +358,18 @@ private fun AddTransactionScreen(
 @Composable
 private fun AddTransactionScreenPreview() {
     SpendLessTheme {
-        AddTransactionScreen(
-            state = AddTransactionState(
-                expenseFormat = ExpensesFormatEnum.MinusPrefix,
-                currency = CurrencyEnum.IDR
-            ),
-            onAction = {}
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(screenBackground)
+        ) {
+            AddTransactionScreen(
+                state = AddTransactionState(
+                    expenseFormat = ExpensesFormatEnum.MinusPrefix,
+                    currency = CurrencyEnum.IDR
+                ),
+                onAction = {}
+            )
+        }
     }
 }

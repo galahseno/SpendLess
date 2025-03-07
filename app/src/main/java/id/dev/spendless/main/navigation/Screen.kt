@@ -12,7 +12,7 @@ sealed class Screen {
         @Serializable
         data object Register {
             @Serializable
-            data object CreatePin
+            data class CreatePin(val fromRegister: Boolean)
 
             @Serializable
             data object RepeatPin

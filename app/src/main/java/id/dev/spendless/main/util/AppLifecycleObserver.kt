@@ -7,7 +7,8 @@ import kotlinx.coroutines.launch
 
 class AppLifecycleObserver(
     private val coroutineScope: CoroutineScope,
-    private val onAppBackground: () -> Unit
+    private val onAppBackground: () -> Unit,
+    private val onAppCreate: () -> Unit,
 ) : DefaultLifecycleObserver {
 
     override fun onStop(owner: LifecycleOwner) {
@@ -20,7 +21,7 @@ class AppLifecycleObserver(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         coroutineScope.launch {
-            onAppBackground()
+            onAppCreate()
         }
     }
 }
