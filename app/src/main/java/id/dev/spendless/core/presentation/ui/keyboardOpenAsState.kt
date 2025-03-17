@@ -14,13 +14,3 @@ fun keyboardOpenAsState(): State<Boolean> {
     val bottomWindow = WindowInsets.ime.getBottom(LocalDensity.current)
     return rememberUpdatedState(bottomWindow > 0)
 }
-// TODO compare with keyboard open when use emulator apk level < 30
-@Composable
-fun keyboardHeightAsState(): State<Dp> {
-    val bottomWindow = WindowInsets.ime.getBottom(LocalDensity.current)
-    var keyboardHeight: Dp
-    with(LocalDensity.current) {
-        keyboardHeight = bottomWindow.toDp()
-    }
-    return rememberUpdatedState(keyboardHeight)
-}

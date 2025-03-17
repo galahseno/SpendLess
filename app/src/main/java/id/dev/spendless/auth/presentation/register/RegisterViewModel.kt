@@ -1,5 +1,6 @@
 package id.dev.spendless.auth.presentation.register
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.dev.spendless.R
@@ -25,9 +26,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _state = MutableStateFlow(RegisterState())
+    private val _state = MutableStateFlow(
+        RegisterState(
+            pin = savedStateHandle.get<String>(PIN_KEY) ?: "",
+            repeatPin = savedStateHandle.get<String>(REPEAT_PIN_KEY) ?: ""
+        )
+    )
     val state = _state.asStateFlow()
 
     private val _event = Channel<RegisterEvent>()
@@ -63,10 +70,7 @@ class RegisterViewModel(
 
     fun onAction(action: RegisterAction) {
         when (action) {
-            is RegisterAction.OnUsernameChanged -> {
-                _state.update { it.copy(username = action.username) }
-            }
-
+            is RegisterAction.OnUsernameChanged -> handleUsernameChanged(action.username)
             is RegisterAction.OnRegisterNextClick -> handleCheckUsername()
             is RegisterAction.OnInputCreatePin -> handleInputCreatePin(action.pin)
             is RegisterAction.OnDeleteCreatePin -> handleDeleteCreatePin()
@@ -80,6 +84,10 @@ class RegisterViewModel(
             is RegisterAction.OnRegisterAccount -> handleRegisterAccount()
             else -> Unit
         }
+    }
+
+    private fun handleUsernameChanged(username: String) {
+        _state.update { it.copy(username = username) }
     }
 
     private fun handleCheckUsername() {
@@ -111,6 +119,7 @@ class RegisterViewModel(
         if (_state.value.pin.length < 5) {
             _state.update { it.copy(pin = it.pin.plus(pin)) }
             if (_state.value.pin.length == 5) {
+                savedStateHandle[PIN_KEY] = _state.value.pin
                 viewModelScope.launch {
                     _event.send(RegisterEvent.OnProcessToRepeatPin)
                 }
@@ -125,6 +134,10 @@ class RegisterViewModel(
     }
 
     private fun handleResetPin() {
+        savedStateHandle.apply {
+            set(PIN_KEY, "")
+            set(REPEAT_PIN_KEY, "")
+        }
         _state.update { it.copy(pin = "", repeatPin = "") }
     }
 
@@ -147,6 +160,7 @@ class RegisterViewModel(
 
     private fun validateRepeatPin() {
         if (_state.value.repeatPin == _state.value.pin) {
+            savedStateHandle[REPEAT_PIN_KEY] = _state.value.repeatPin
             viewModelScope.launch {
                 _event.send(RegisterEvent.OnProcessToOnboardingPreferences)
             }
@@ -267,5 +281,10 @@ class RegisterViewModel(
 
     private fun isValidUsername(username: String): Boolean {
         return username.length in 3..14
+    }
+
+    companion object {
+        private const val PIN_KEY = "PIN_KEY"
+        private const val REPEAT_PIN_KEY = "REPEAT_PIN_KEY"
     }
 }

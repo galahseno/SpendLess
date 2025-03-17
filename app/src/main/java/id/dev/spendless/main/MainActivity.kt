@@ -2,6 +2,7 @@ package id.dev.spendless.main
 
 import android.animation.ObjectAnimator
 import android.content.ComponentCallbacks2
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.OvershootInterpolator
@@ -15,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.main.navigation.NavigationRoot
 import id.dev.spendless.main.util.BiometricPromptManager
+import id.dev.spendless.widget.SpendLessAppWidgetUpdate.Companion.FROM_WIDGET_KEY
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.KoinContext
@@ -49,7 +51,10 @@ class MainActivity : AppCompatActivity(), ComponentCallbacks2 {
                 ).apply {
                     interpolator = OvershootInterpolator()
                     duration = 500L
-                    doOnEnd { screen.remove() }
+                    doOnEnd {
+                        screen.remove()
+                        handleIntent(intent)
+                    }
                 }
 
                 zoomX.start()
@@ -82,10 +87,24 @@ class MainActivity : AppCompatActivity(), ComponentCallbacks2 {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
             viewModel.resetSession()
+        }
+    }
+
+    private fun handleIntent(intent: Intent) {
+        intent.getBooleanExtra(FROM_WIDGET_KEY, false).let { fromWidget ->
+            if (fromWidget) {
+                viewModel.actionCreateTransaction()
+                intent.removeExtra(FROM_WIDGET_KEY)
+            }
         }
     }
 }

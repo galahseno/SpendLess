@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -47,8 +51,11 @@ fun NavigationRoot(
     savedBackStack: List<String>,
     onSaveBackStack: (List<String>) -> Unit,
 ) {
-    LaunchedEffect(isSessionExpired) {
-        if (isSessionExpired) {
+    val currentIsSessionExpired by rememberUpdatedState(newValue = isSessionExpired)
+    var hasNavigated by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(currentIsSessionExpired) {
+        if (currentIsSessionExpired && !hasNavigated) {
             val currentBackStack =
                 navController.currentBackStack.value.map { it.destination.route ?: "" }
             onSaveBackStack(currentBackStack)
@@ -59,6 +66,7 @@ fun NavigationRoot(
                     saveState = true
                 }
             }
+            hasNavigated = true
         }
     }
 
@@ -68,7 +76,14 @@ fun NavigationRoot(
         modifier = Modifier.fillMaxSize()
     ) {
         authGraph(navController)
-        sessionGraph(navController, savedBackStack, promptManager)
+        sessionGraph(
+            onSuccessValidation = {
+                hasNavigated = false
+            },
+            navController,
+            savedBackStack,
+            promptManager
+        )
         homeGraph(navController)
         transactionGraph(navController)
         settingsGraph(navController)
@@ -283,6 +298,7 @@ private fun NavGraphBuilder.homeGraph(navController: NavHostController) {
 }
 
 private fun NavGraphBuilder.sessionGraph(
+    onSuccessValidation: () -> Unit,
     navController: NavHostController,
     savedBackStack: List<String>,
     promptManager: BiometricPromptManager
@@ -297,6 +313,7 @@ private fun NavGraphBuilder.sessionGraph(
         ) {
             PinPromptScreenRoot(
                 onSuccessValidateSession = {
+                    onSuccessValidation()
                     if (savedBackStack.isNotEmpty()) {
                         val filteredBackStack = savedBackStack.filter { route ->
                             route != "" && route != navController.graph.startDestinationRoute

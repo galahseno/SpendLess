@@ -65,4 +65,5 @@
     <string name="try_your_pin_again_in">Try your PIN again in %1$s</string>
     <string name="cancel">Cancel</string>
     <string name="biometric_description">Use fingerprint or face ID to unlock</string>
+    <string name="app_widget_description">SpendLess Widget</string>
 </resources>

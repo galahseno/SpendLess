@@ -101,8 +101,6 @@ fun ExpenseCategoryDropDown(
             MaterialTheme(
                 shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp)),
             ) {
-
-                // TODO add scroll bar same as project overview
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth(),
