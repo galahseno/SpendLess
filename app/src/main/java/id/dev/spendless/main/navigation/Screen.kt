@@ -37,10 +37,7 @@ sealed class Screen {
     @Serializable
     data object Transaction {
         @Serializable
-        data object AllTransaction {
-            @Serializable
-            data object Export
-        }
+        data object AllTransaction
     }
 
     @Serializable

@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import id.dev.spendless.core.data.database.entity.TransactionEntity
-import id.dev.spendless.core.domain.model.transaction.EncryptedCategoryWithEmoji
 import id.dev.spendless.core.domain.model.transaction.Balance
+import id.dev.spendless.core.domain.model.transaction.EncryptedCategoryWithEmoji
 import id.dev.spendless.core.domain.model.transaction.EncryptedLargestTransaction
 import kotlinx.coroutines.flow.Flow
 
@@ -45,4 +45,11 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE user_id = :userId ORDER BY createdAt DESC Limit 20")
     fun getLatestTransactions(userId: Int): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transactions WHERE user_id = :userId AND createdAt >= :startDate")
+    suspend fun getTransactionsAfter(userId: Int, startDate: Long): List<TransactionEntity>
+
+    @Query("SELECT * FROM transactions WHERE user_id = :userId AND strftime('%Y', datetime(createdAt / 1000, 'unixepoch')) = :year " +
+            "AND strftime('%m', datetime(createdAt / 1000, 'unixepoch')) = :month")
+    suspend fun getTransactionsByMonth(userId: Int, year: String, month: String): List<TransactionEntity>
 }

@@ -189,8 +189,16 @@ class SettingPreferencesImpl(
         userSessionDataStore.updateData { it.copy(addBottomSheetState = value) }
     }
 
-    override fun getBottomSheetValue(): Flow<Boolean> {
+    override fun getAddBottomSheetValue(): Flow<Boolean> {
         return userSessionDataStore.data.map { it.addBottomSheetState }
+    }
+
+    override suspend fun changeExportBottomSheetValue(value: Boolean) {
+        userSessionDataStore.updateData { it.copy(exportBottomSheetState = value) }
+    }
+
+    override fun getExportBottomSheetValue(): Flow<Boolean> {
+        return userSessionDataStore.data.map { it.exportBottomSheetState }
     }
 
     private companion object {

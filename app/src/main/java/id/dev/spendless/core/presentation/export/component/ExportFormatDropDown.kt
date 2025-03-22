@@ -1,4 +1,4 @@
-package id.dev.spendless.core.presentation.design_system.component.preferences
+package id.dev.spendless.core.presentation.export.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,23 +33,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import id.dev.spendless.core.domain.model.export.ExportFormatEnum
 import id.dev.spendless.core.presentation.design_system.SpendLessTheme
 import id.dev.spendless.core.presentation.design_system.buttonBackground
 import id.dev.spendless.core.presentation.design_system.componentBackground
 import id.dev.spendless.core.presentation.ui.crop
-import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyDropDown(
-    selectedCurrency: CurrencyEnum,
-    onSelectedCurrency: (CurrencyEnum) -> Unit,
+fun ExportFormatDropDown(
+    selectedFormat: ExportFormatEnum,
+    onSelectedFormat: (ExportFormatEnum) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -75,21 +72,11 @@ fun CurrencyDropDown(
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxSize()
-                    .padding(end = 10.dp),
+                    .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = selectedCurrency.symbol,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.W500
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(start = 14.dp)
-                )
-                Text(
-                    text = selectedCurrency.currencyName,
+                    text = selectedFormat.name,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .weight(1f)
@@ -115,36 +102,24 @@ fun CurrencyDropDown(
                         offset = DpOffset(x = 0.dp, y = maxHeight + 6.dp ),
                         onDismissRequest = { expanded = false }
                     ) {
-                        CurrencyEnum.entries.forEach { item ->
+                        ExportFormatEnum.entries.forEach { item ->
                             DropdownMenuItem(
-                                contentPadding = PaddingValues(horizontal = 0.dp),
-                                leadingIcon = {
-                                    Text(
-                                        text = item.symbol,
-                                        style = MaterialTheme.typography.headlineMedium.copy(
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.W500
-                                        ),
-                                        textAlign = TextAlign.Start,
-                                        modifier = Modifier
-                                            .padding(start = 14.dp)
-                                    )
-                                },
+                                contentPadding = PaddingValues(start = 16.dp, end = 8.dp),
                                 text = {
                                     Text(
-                                        text = item.currencyName,
+                                        text = item.name,
                                         style = MaterialTheme.typography.titleMedium,
                                     )
                                 },
                                 onClick = {
-                                    onSelectedCurrency(item)
+                                    onSelectedFormat(item)
                                     expanded = false
                                 },
                                 trailingIcon = {
-                                    if (selectedCurrency.symbol == item.symbol) {
+                                    if (selectedFormat.name == item.name) {
                                         Icon(
                                             imageVector = Icons.Rounded.Check,
-                                            contentDescription = "selected_currency",
+                                            contentDescription = "selected_format",
                                             tint = buttonBackground
                                         )
                                     }
@@ -160,16 +135,16 @@ fun CurrencyDropDown(
 
 @Preview(showBackground = true)
 @Composable
-private fun CurrencyDropDownPreview() {
+private fun ExportFormatDropDownPreview() {
     SpendLessTheme {
         Box(
             modifier = Modifier.size(400.dp),
             contentAlignment = Alignment.Center
         ) {
-            CurrencyDropDown(
-                selectedCurrency = CurrencyEnum.IDR,
+            ExportFormatDropDown(
+                selectedFormat = ExportFormatEnum.CSV,
                 modifier = Modifier.padding(20.dp),
-                onSelectedCurrency = {
+                onSelectedFormat = {
 
                 }
             )

@@ -4,5 +4,6 @@ import id.dev.spendless.core.domain.model.transaction.TransactionGroup
 
 data class AllTransactionState(
     val allTransactions: List<TransactionGroup> = emptyList(),
-    val showBottomSheet: Boolean = false
+    val showBottomSheet: Boolean = false,
+    val showExportBottomSheet: Boolean = false,
 )

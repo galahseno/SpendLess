@@ -11,5 +11,4 @@ interface DashboardRepository {
     fun getLargestTransaction(): Flow<LargestTransaction?>
     fun getTotalSpentPreviousWeek(): Flow<Double?>
     fun getLatestTransactions(): Flow<List<Transaction>>
-    fun getAllTransactions(): Flow<List<Transaction>>
 }

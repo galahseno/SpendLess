@@ -141,6 +141,7 @@ private fun AddTransactionScreen(
         )
         keyboardController?.hide()
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

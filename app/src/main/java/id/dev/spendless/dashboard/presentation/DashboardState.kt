@@ -12,6 +12,6 @@ data class DashboardState(
     val largestTransactionCategoryAllTime: CategoryWithEmoji = CategoryWithEmoji(),
     val largestTransaction: LargestTransaction = LargestTransaction(),
     val latestTransactions: List<TransactionGroup> = emptyList(),
-    val showBottomSheet: Boolean = false
-    //
+    val showAddBottomSheet: Boolean = false,
+    val showExportBottomSheet: Boolean = false,
 )

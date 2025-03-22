@@ -12,6 +12,7 @@ data class UserSessionPref(
     val decimalSeparator: String = "Dot",
     val thousandSeparator: String = "Comma",
     val addBottomSheetState: Boolean = false,
+    val exportBottomSheetState: Boolean = false,
 )
 
 fun UserSessionPref.toUserSession(): UserSession {
@@ -22,7 +23,8 @@ fun UserSessionPref.toUserSession(): UserSession {
         currencySymbol = currencySymbol,
         decimalSeparator = decimalSeparator,
         thousandSeparator = thousandSeparator,
-        addBottomSheetState = addBottomSheetState
+        addBottomSheetState = addBottomSheetState,
+        exportBottomSheetState = exportBottomSheetState
     )
 }
 

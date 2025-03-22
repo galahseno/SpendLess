@@ -33,7 +33,7 @@ import id.dev.spendless.core.presentation.design_system.component.SpendLessFab
 import id.dev.spendless.core.presentation.design_system.component.transaction.EmptyTransaction
 import id.dev.spendless.core.presentation.design_system.gradientBackground
 import id.dev.spendless.core.presentation.design_system.screenBackground
-import id.dev.spendless.core.presentation.ui.ObserveAsEvents
+import id.dev.spendless.core.presentation.export.ExportScreenRoot
 import id.dev.spendless.core.presentation.ui.formatTotalSpend
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
@@ -60,10 +60,6 @@ fun DashboardScreenRoot(
         WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
     }
 
-    ObserveAsEvents(viewModel.event) {
-
-    }
-
     DashboardScreen(
         state = state,
         onAction = { action ->
@@ -83,7 +79,8 @@ private fun DashboardScreen(
     state: DashboardState,
     onAction: (DashboardAction) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val addSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val exportSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -92,6 +89,9 @@ private fun DashboardScreen(
                 username = state.username,
                 onSettingClick = {
                     onAction(DashboardAction.OnSettingClick)
+                },
+                onExportClick = {
+                    onAction(DashboardAction.OnExportClick)
                 }
             )
         },
@@ -141,8 +141,8 @@ private fun DashboardScreen(
                         onShowAllClick = {
                             onAction(DashboardAction.OnShowAllClick)
                         },
-                        onItemClick = {
-                            onAction(DashboardAction.OnItemTransactionClick(it))
+                        onItemClick = {id ->
+                            onAction(DashboardAction.OnItemTransactionClick(id))
                         },
                         allTransactions = state.latestTransactions,
                         modifier = Modifier
@@ -158,15 +158,32 @@ private fun DashboardScreen(
             }
 
             AnimatedVisibility(
-                visible = state.showBottomSheet
+                visible = state.showAddBottomSheet
             ) {
                 AddTransactionScreenRoot(
-                    sheetState = sheetState,
+                    sheetState = addSheetState,
                     onDismissRequest = {
                         scope.launch {
-                            sheetState.hide()
+                            addSheetState.hide()
                         }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
+                            if (!addSheetState.isVisible) {
+                                onAction(DashboardAction.OnCloseBottomSheet)
+                            }
+                        }
+                    }
+                )
+            }
+
+            AnimatedVisibility(
+                visible = state.showExportBottomSheet
+            ) {
+                ExportScreenRoot(
+                    sheetState = exportSheetState,
+                    onDismissRequest = {
+                        scope.launch {
+                            exportSheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!exportSheetState.isVisible) {
                                 onAction(DashboardAction.OnCloseBottomSheet)
                             }
                         }

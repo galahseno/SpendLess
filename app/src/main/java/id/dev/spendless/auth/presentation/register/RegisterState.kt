@@ -22,5 +22,4 @@ data class RegisterState(
     val selectedDecimalSeparator: DecimalSeparatorEnum = DecimalSeparatorEnum.Comma,
     val selectedThousandSeparator: ThousandsSeparatorEnum = ThousandsSeparatorEnum.Dot,
     val canProsesRegister: Boolean = false,
-    //
 )

@@ -11,7 +11,6 @@ import id.dev.spendless.dashboard.presentation.di.dashboardPresentationModule
 import id.dev.spendless.main.MainViewModel
 import id.dev.spendless.main.di.appModule
 import id.dev.spendless.main.util.AppLifecycleObserver
-import id.dev.spendless.settings.data.di.settingsDataModule
 import id.dev.spendless.settings.presentation.di.settingsPresentationModule
 import id.dev.spendless.transaction.data.di.transactionDataModule
 import id.dev.spendless.transaction.presentation.di.transactionPresentationModule
@@ -43,7 +42,6 @@ class SpendLessApp : Application() {
                 dashboardPresentationModule,
                 transactionDataModule,
                 transactionPresentationModule,
-                settingsDataModule,
                 settingsPresentationModule
             )
         }

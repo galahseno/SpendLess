@@ -122,14 +122,6 @@ class DashboardRepositoryImpl(
         }
     }
 
-    override fun getAllTransactions(): Flow<List<Transaction>> {
-        return settingPreferences.getUserId().flatMapConcat { userId ->
-            transactionDao.getAllTransactions(userId).map { transactions ->
-                transactions.map { decryptTransactions(it) }
-            }
-        }
-    }
-
     private fun decryptAmount(balance: Balance): Double {
         val decryptedAmount =
             encryptionService.decrypt(balance.amount, balance.amountIv)
