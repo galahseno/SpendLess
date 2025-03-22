@@ -33,7 +33,7 @@ import id.dev.spendless.core.presentation.design_system.gradientBackground
 fun DashboardTopAppBar(
     username: String,
     onSettingClick: () -> Unit,
-    // TODO Open Export Screen
+    onExportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -55,7 +55,7 @@ fun DashboardTopAppBar(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White.copy(alpha = 0.12f))
                     .clickable {
-
+                        onExportClick()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -73,7 +73,7 @@ fun DashboardTopAppBar(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White.copy(alpha = 0.12f))
                     .clickable {
-                        
+                        onSettingClick()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -81,10 +81,6 @@ fun DashboardTopAppBar(
                     imageVector = ImageVector.vectorResource(R.drawable.setting_icon),
                     contentDescription = "export",
                     tint = Color.White,
-                    modifier = Modifier
-                        .clickable {
-                            onSettingClick()
-                        }
                 )
             }
         }
@@ -100,9 +96,8 @@ private fun TopAppBarDashboardPreview() {
         ) {
             DashboardTopAppBar(
                 username = "rockefeller74",
-                onSettingClick = {
-
-                }
+                onSettingClick = {},
+                onExportClick = {}
             )
         }
     }

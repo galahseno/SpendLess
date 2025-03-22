@@ -53,5 +53,7 @@ interface SettingPreferences {
     suspend fun updateLatestDuration(value: Long)
 
     suspend fun changeAddBottomSheetValue(value: Boolean)
-    fun getBottomSheetValue(): Flow<Boolean>
+    fun getAddBottomSheetValue(): Flow<Boolean>
+    suspend fun changeExportBottomSheetValue(value: Boolean)
+    fun getExportBottomSheetValue(): Flow<Boolean>
 }

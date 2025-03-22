@@ -66,4 +66,9 @@
     <string name="cancel">Cancel</string>
     <string name="biometric_description">Use fingerprint or face ID to unlock</string>
     <string name="app_widget_description">SpendLess Widget</string>
+    <string name="export">Export</string>
+    <string name="export_range">Export Range</string>
+    <string name="export_format">Export format</string>
+    <string name="no_data_export">No data found in export range</string>
+    <string name="share_transactions">share transaction data</string>
 </resources>

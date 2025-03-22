@@ -8,4 +8,5 @@ data class UserSession(
     val decimalSeparator: String,
     val thousandSeparator: String,
     val addBottomSheetState: Boolean,
+    val exportBottomSheetState: Boolean,
 )

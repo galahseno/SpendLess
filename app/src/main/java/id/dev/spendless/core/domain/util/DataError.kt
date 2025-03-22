@@ -6,5 +6,6 @@ sealed interface DataError: Error {
         USER_EXIST,
         USER_NOT_EXIST,
         USER_AND_PIN_INCORRECT,
+        NO_DATA
     }
 }

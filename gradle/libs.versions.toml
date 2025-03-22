@@ -3,6 +3,8 @@ agp = "8.6.1"
 androidDatabaseSqlcipher = "4.5.3"
 biometric = "1.1.0"
 datastorePreferences = "1.1.3"
+desugar_jdk_libs = "2.1.5"
+itextpdf = "5.5.13.1"
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
 coreKtx = "1.15.0"
@@ -16,6 +18,7 @@ composeBom = "2024.04.01"
 koin = "4.0.0"
 navigationCompose = "2.8.8"
 kotlinx-serialization = "1.8.0"
+pdfboxAndroid = "2.0.27.0"
 roomRuntime = "2.6.1"
 glance = "1.1.1"
 securityCrypto = "1.0.0"
@@ -30,6 +33,8 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconExtended" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+itextpdf = { module = "com.itextpdf:itextpdf", version.ref = "itextpdf" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -57,6 +62,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 
 androidx-ui-glance = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 androidx-ui-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
+pdfbox-android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfboxAndroid" }
 
 
 [plugins]

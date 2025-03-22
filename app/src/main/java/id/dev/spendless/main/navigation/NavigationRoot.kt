@@ -38,7 +38,6 @@ import id.dev.spendless.settings.presentation.SettingScreenRoot
 import id.dev.spendless.settings.presentation.preferences.PreferencesScreenRoot
 import id.dev.spendless.settings.presentation.security.SecurityScreenRoot
 import id.dev.spendless.transaction.presentation.AllTransactionScreenRoot
-import id.dev.spendless.transaction.presentation.export.ExportScreenRoot
 import org.koin.androidx.compose.navigation.koinNavViewModel
 
 @SuppressLint("RestrictedApi")
@@ -358,12 +357,6 @@ private fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
                 onBackClick = {
                     navController.navigateUp()
                 }
-            )
-        }
-        // todo move to core since is bottom sheet and can be access from dashboard and transaction
-        composable<Screen.Transaction.AllTransaction.Export> {
-            ExportScreenRoot(
-
             )
         }
     }

@@ -81,7 +81,6 @@ fun TransactionLazyList(
                         .then(
                             if (it.isNoteOpen) {
                                 Modifier
-
                                     .background(componentBackground)
                             } else Modifier
                         )

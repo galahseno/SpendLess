@@ -15,14 +15,12 @@ import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
 import id.dev.spendless.core.presentation.ui.preferences.ThousandsSeparatorEnum
 import id.dev.spendless.dashboard.domain.DashboardRepository
 import id.dev.spendless.dashboard.presentation.util.formatTimestamp
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -35,9 +33,6 @@ class DashboardViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(DashboardState())
     val state = _state.asStateFlow()
-
-    private val _event = Channel<DashboardEvent>()
-    val event = _event.receiveAsFlow()
 
     init {
         combine(
@@ -152,12 +147,23 @@ class DashboardViewModel(
             }.launchIn(viewModelScope)
 
         settingPreferences
-            .getBottomSheetValue()
+            .getAddBottomSheetValue()
             .distinctUntilChanged()
             .onEach { showBottomSheet ->
                 _state.update {
                     it.copy(
-                        showBottomSheet = showBottomSheet
+                        showAddBottomSheet = showBottomSheet
+                    )
+                }
+            }.launchIn(viewModelScope)
+
+        settingPreferences
+            .getExportBottomSheetValue()
+            .distinctUntilChanged()
+            .onEach { showBottomSheet ->
+                _state.update {
+                    it.copy(
+                        showExportBottomSheet = showBottomSheet
                     )
                 }
             }.launchIn(viewModelScope)
@@ -165,32 +171,8 @@ class DashboardViewModel(
 
     fun onAction(action: DashboardAction) {
         when (action) {
-            is DashboardAction.OnItemTransactionClick -> {
-                _state.update {
-                    it.copy(
-                        latestTransactions = it.latestTransactions.map { group ->
-                            group.copy(
-                                transactions = group.transactions.map { transaction ->
-                                    if (transaction.id == action.id) {
-                                        transaction.copy(isNoteOpen = !transaction.isNoteOpen)
-                                    } else {
-                                        transaction
-                                    }
-                                }
-                            )
-                        }
-                    )
-                }
-            }
-
-            is DashboardAction.OnFABClick -> {
-                viewModelScope.launch {
-                    val isSessionValid = settingPreferences.checkSessionExpired()
-                    if (isSessionValid) return@launch
-
-                    settingPreferences.changeAddBottomSheetValue(true)
-                }
-            }
+            is DashboardAction.OnItemTransactionClick -> handleTransactionClick(action.id)
+            is DashboardAction.OnFABClick -> handleFABClick()
 
             is DashboardAction.OnShowAllClick, DashboardAction.OnSettingClick -> {
                 viewModelScope.launch {
@@ -201,8 +183,42 @@ class DashboardViewModel(
             is DashboardAction.OnCloseBottomSheet -> {
                 viewModelScope.launch {
                     settingPreferences.changeAddBottomSheetValue(false)
+                    settingPreferences.changeExportBottomSheetValue(false)
                 }
             }
+
+            is DashboardAction.OnExportClick -> {
+                viewModelScope.launch {
+                    settingPreferences.changeExportBottomSheetValue(true)
+                }
+            }
+        }
+    }
+
+    private fun handleTransactionClick(id: Int) {
+        _state.update {
+            it.copy(
+                latestTransactions = it.latestTransactions.map { group ->
+                    group.copy(
+                        transactions = group.transactions.map { transaction ->
+                            if (transaction.id == id) {
+                                transaction.copy(isNoteOpen = !transaction.isNoteOpen)
+                            } else {
+                                transaction
+                            }
+                        }
+                    )
+                }
+            )
+        }
+    }
+
+    private fun handleFABClick() {
+        viewModelScope.launch {
+            val isSessionValid = settingPreferences.checkSessionExpired()
+            if (isSessionValid) return@launch
+
+            settingPreferences.changeAddBottomSheetValue(true)
         }
     }
 }

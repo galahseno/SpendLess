@@ -100,8 +100,7 @@ val coreDataModule = module {
             SpendLessDb::class.java,
             "spendless.db"
         )
-            // TODO uncomment to enable db encryption
-            //.openHelperFactory(supportFactory)
+            .openHelperFactory(supportFactory)
             .build()
     }
     single { get<SpendLessDb>().transactionDao() }

@@ -26,7 +26,7 @@ import id.dev.spendless.core.presentation.design_system.component.SpendLessFab
 import id.dev.spendless.core.presentation.design_system.component.transaction.EmptyTransaction
 import id.dev.spendless.core.presentation.design_system.component.transaction.TransactionLazyList
 import id.dev.spendless.core.presentation.design_system.screenBackground
-import id.dev.spendless.core.presentation.ui.ObserveAsEvents
+import id.dev.spendless.core.presentation.export.ExportScreenRoot
 import id.dev.spendless.transaction.presentation.component.AllTransactionTopAppBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -42,10 +42,6 @@ fun AllTransactionScreenRoot(
     SideEffect {
         val window = (view.context as Activity).window
         WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-    }
-
-    ObserveAsEvents(viewModel.event) {
-
     }
 
     AllTransactionScreen(
@@ -67,6 +63,7 @@ private fun AllTransactionScreen(
     onAction: (AllTransactionAction) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val exportSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -77,8 +74,7 @@ private fun AllTransactionScreen(
                     onAction(AllTransactionAction.OnBackClick)
                 },
                 onExportClick = {
-                    // TODO Export sheet
-                    // TODO Check session expired
+                    onAction(AllTransactionAction.OnExportClick)
                 },
             )
         },
@@ -102,8 +98,8 @@ private fun AllTransactionScreen(
             if (state.allTransactions.isNotEmpty()) {
                 TransactionLazyList(
                     allTransactions = state.allTransactions,
-                    onItemClick = {
-                        onAction(AllTransactionAction.OnItemTransactionClick(it))
+                    onItemClick = { id ->
+                        onAction(AllTransactionAction.OnItemTransactionClick(id))
                     },
                     modifier = Modifier
                         .fillMaxSize()
@@ -127,7 +123,24 @@ private fun AllTransactionScreen(
                             sheetState.hide()
                         }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
-                               onAction(AllTransactionAction.OnCloseBottomSheet)
+                                onAction(AllTransactionAction.OnCloseBottomSheet)
+                            }
+                        }
+                    }
+                )
+            }
+
+            AnimatedVisibility(
+                visible = state.showExportBottomSheet
+            ) {
+                ExportScreenRoot(
+                    sheetState = exportSheetState,
+                    onDismissRequest = {
+                        scope.launch {
+                            exportSheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!exportSheetState.isVisible) {
+                                onAction(AllTransactionAction.OnCloseBottomSheet)
                             }
                         }
                     }

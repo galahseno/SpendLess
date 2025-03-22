@@ -1,6 +1,7 @@
 package id.dev.spendless.core.presentation.ui
 
 
+import id.dev.spendless.core.domain.model.export.MonthYear
 import id.dev.spendless.core.presentation.ui.preferences.CurrencyEnum
 import id.dev.spendless.core.presentation.ui.preferences.DecimalSeparatorEnum
 import id.dev.spendless.core.presentation.ui.preferences.ExpensesFormatEnum
@@ -9,6 +10,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -85,4 +87,10 @@ fun Long.formatTryAgainPinDuration(): String {
 
 fun Double?.formatDoubleDigit() : String {
     return String.format(Locale.getDefault(), "%.2f", this)
+}
+
+fun MonthYear.toDisplayString(): String {
+    val date = LocalDate.of(year, month, 1)
+    val monthName = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    return "$monthName $year"
 }

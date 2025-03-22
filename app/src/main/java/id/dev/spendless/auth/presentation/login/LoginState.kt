@@ -10,5 +10,4 @@ data class LoginState(
     val pinSupportText: UiText? = null,
     val isErrorVisible: Boolean = false,
     val errorMessage: UiText? = null
-    //
 )
