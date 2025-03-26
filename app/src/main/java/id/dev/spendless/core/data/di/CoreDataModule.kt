@@ -17,6 +17,8 @@ import id.dev.spendless.core.data.pref.model.UserSessionPref
 import id.dev.spendless.core.data.pref.serializer.DataStoreSerializer
 import id.dev.spendless.core.data.security.AesEncryptionService
 import id.dev.spendless.core.data.security.KeyManager
+import id.dev.spendless.core.data.utils.CryptoHelper
+import id.dev.spendless.core.data.utils.ExportHelper
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.EncryptionService
 import id.dev.spendless.core.domain.SettingPreferences
@@ -37,15 +39,17 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = PREFERENCES_DATA_STORE_NAME
 )
 
-val userSessionDataStoreQualifier = named(USER_SESSION_PREFERENCES_NAME)
-val userSecurityDataStoreQualifier = named(USER_SECURITY_PREFERENCES_NAME)
-val pinPromptDataStoreQualifier = named(PIN_PROMPT_PREFERENCES_NAME)
-val preferencesDataStoreQualifier = named(PREFERENCES_DATA_STORE_NAME)
-
 val coreDataModule = module {
+    val userSessionDataStoreQualifier = named(USER_SESSION_PREFERENCES_NAME)
+    val userSecurityDataStoreQualifier = named(USER_SECURITY_PREFERENCES_NAME)
+    val pinPromptDataStoreQualifier = named(PIN_PROMPT_PREFERENCES_NAME)
+    val preferencesDataStoreQualifier = named(PREFERENCES_DATA_STORE_NAME)
+
+    singleOf(::CryptoHelper)
+    singleOf(::ExportHelper)
     singleOf(::CoreRepositoryImpl).bind<CoreRepository>()
 
-    single(qualifier = userSessionDataStoreQualifier) {
+    single<DataStore<UserSessionPref>>(qualifier = userSessionDataStoreQualifier) {
         DataStoreFactory.create(
             serializer = DataStoreSerializer(
                 encryptionService = get(),
@@ -56,7 +60,7 @@ val coreDataModule = module {
         )
     }
 
-    single(qualifier = userSecurityDataStoreQualifier) {
+    single<DataStore<UserSecurityPref>>(qualifier = userSecurityDataStoreQualifier) {
         DataStoreFactory.create(
             serializer = DataStoreSerializer(
                 encryptionService = get(),
@@ -67,7 +71,7 @@ val coreDataModule = module {
         )
     }
 
-    single(qualifier = pinPromptDataStoreQualifier) {
+    single<DataStore<PinPromptAttemptPref>>(qualifier = pinPromptDataStoreQualifier) {
         DataStoreFactory.create(
             serializer = DataStoreSerializer(
                 encryptionService = get(),
@@ -78,16 +82,16 @@ val coreDataModule = module {
         )
     }
 
-    single(qualifier = preferencesDataStoreQualifier) {
+    single<DataStore<Preferences>>(qualifier = preferencesDataStoreQualifier) {
         androidContext().dataStore
     }
 
     single {
         SettingPreferencesImpl(
-            get(qualifier = preferencesDataStoreQualifier),
-            get(qualifier = userSessionDataStoreQualifier),
-            get(qualifier = userSecurityDataStoreQualifier),
-            get(qualifier = pinPromptDataStoreQualifier)
+            get<DataStore<Preferences>>(qualifier = preferencesDataStoreQualifier),
+            get<DataStore<UserSessionPref>>(qualifier = userSessionDataStoreQualifier),
+            get<DataStore<UserSecurityPref>>(qualifier = userSecurityDataStoreQualifier),
+            get<DataStore<PinPromptAttemptPref>>(qualifier = pinPromptDataStoreQualifier)
         )
     }.bind<SettingPreferences>()
 

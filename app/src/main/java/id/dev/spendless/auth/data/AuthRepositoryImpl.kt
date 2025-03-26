@@ -4,7 +4,7 @@ import id.dev.spendless.auth.domain.AuthRepository
 import id.dev.spendless.core.data.database.dao.PreferencesDao
 import id.dev.spendless.core.data.database.dao.UserDao
 import id.dev.spendless.core.data.database.entity.UserEntity
-import id.dev.spendless.core.domain.EncryptionService
+import id.dev.spendless.core.data.utils.CryptoHelper
 import id.dev.spendless.core.domain.SettingPreferences
 import id.dev.spendless.core.domain.util.DataError
 import id.dev.spendless.core.domain.util.Result
@@ -16,7 +16,7 @@ class AuthRepositoryImpl(
     private val settingPreferences: SettingPreferences,
     private val userDao: UserDao,
     private val preferencesDao: PreferencesDao,
-    private val encryptionService: EncryptionService,
+    private val cryptoHelper: CryptoHelper
 ) : AuthRepository {
     override suspend fun checkUsernameExists(username: String): Result<Unit, DataError.Local> =
         withContext(Dispatchers.IO) {
@@ -42,7 +42,7 @@ class AuthRepositoryImpl(
         thousandSeparator: String
     ): Result<Unit, DataError.Local> = withContext(Dispatchers.IO) {
         try {
-            val (encryptedPin, encryptedIv) = encryptionService.encrypt(pin)
+            val (encryptedPin, encryptedIv) = cryptoHelper.encryptField(pin)
 
             val userEntity = UserEntity(username = username, pin = encryptedPin, iv = encryptedIv)
             val userId = userDao.createUser(userEntity)
@@ -82,7 +82,7 @@ class AuthRepositoryImpl(
             val user = userDao.loginAccount(username)
                 ?: return@withContext Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
 
-            if (encryptionService.decrypt(user.pin, user.iv) != pin) {
+            if (cryptoHelper.decryptField(user.pin, user.iv) != pin) {
                 return@withContext Result.Error(DataError.Local.USER_AND_PIN_INCORRECT)
             }
 
@@ -107,11 +107,9 @@ class AuthRepositoryImpl(
             )
 
             return@withContext Result.Success(Unit)
-
         } catch (_: Exception) {
             coroutineContext.ensureActive()
             return@withContext Result.Error(DataError.Local.ERROR_PROSES)
         }
     }
-
 }

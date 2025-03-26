@@ -49,6 +49,22 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE user_id = :userId AND createdAt >= :startDate")
     suspend fun getTransactionsAfter(userId: Int, startDate: Long): List<TransactionEntity>
 
+    @Query("""
+    SELECT * FROM transactions 
+    WHERE user_id = :userId 
+    AND datetime(createdAt / 1000, 'unixepoch') 
+        BETWEEN datetime(:startDate, 'unixepoch') 
+        AND datetime(:endDate, 'unixepoch')
+    ORDER BY createdAt DESC
+    """)
+    suspend fun getTransactionsBetweenDates(
+        userId: Int,
+        startDate: Long,
+        endDate: Long
+    ): List<TransactionEntity>
+    //1743003798893
+    //1740762000
+
     @Query("SELECT * FROM transactions WHERE user_id = :userId AND strftime('%Y', datetime(createdAt / 1000, 'unixepoch')) = :year " +
             "AND strftime('%m', datetime(createdAt / 1000, 'unixepoch')) = :month")
     suspend fun getTransactionsByMonth(userId: Int, year: String, month: String): List<TransactionEntity>
