@@ -19,9 +19,7 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.ContentScale
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
@@ -71,7 +69,6 @@ class SpendLessAppWidgetUpdate : GlanceAppWidget() {
                             modifier = GlanceModifier
                                 .size(52.dp)
                         )
-                        Spacer(modifier = GlanceModifier.height(12.dp))
                         Text(
                             context.getString(R.string.create_transaction),
                             style = TextStyle(color = ColorProvider(Color.White)),

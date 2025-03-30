@@ -157,7 +157,7 @@ class AddTransactionViewModel(
     }
 
     private fun handleTransactionTypeSelected(transactionType: TransactionTypeEnum) {
-        _state.update { it.copy(selectedTransactionType = transactionType) }
+            _state.update { it.copy(selectedTransactionType = transactionType) }
     }
 
     private fun handleExpenseOrIncomeNameChanged(

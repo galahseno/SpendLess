@@ -51,7 +51,6 @@ class LoginViewModel(
         }.launchIn(viewModelScope)
     }
 
-
     fun onAction(action: LoginAction) {
         when (action) {
             is LoginAction.OnUsernameChanged -> {

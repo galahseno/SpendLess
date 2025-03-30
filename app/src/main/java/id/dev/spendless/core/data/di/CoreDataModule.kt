@@ -22,6 +22,7 @@ import id.dev.spendless.core.data.utils.ExportHelper
 import id.dev.spendless.core.domain.CoreRepository
 import id.dev.spendless.core.domain.EncryptionService
 import id.dev.spendless.core.domain.SettingPreferences
+import kotlinx.serialization.builtins.serializer
 import net.sqlcipher.database.SupportFactory
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
