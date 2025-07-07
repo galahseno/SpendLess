@@ -1,6 +1,6 @@
 ## SpendLess
 
-A secure finance tracking Android app written in Kotlin using Jetpack Compose
+A secure finance tracking Android app written in Kotlin using Jetpack Compose, built for the [Mobile Dev Campus](https://pl-coding.com/campus) by Phillip Lackner as part of the monthly challenge (march 2025). This app is made for fun and to improve skills.
 
 ## Screenshots
 
